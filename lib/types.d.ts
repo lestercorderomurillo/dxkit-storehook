@@ -6,13 +6,17 @@ export type Store<StateType = any> = {
 export type MutationsSchema = {
     [actionName: string]: Function;
 };
+export type StoreSetMutationProps = {
+    path?: string;
+    value: any;
+};
 export type createStoreProps<StateType = any> = {
     initialState: StateType | undefined;
     mutations?: (operations: {
         state: () => StateType;
         reset: () => void;
-        set: (state: StateType) => void;
-        merge: (state: StateType) => void;
+        set: (setParams: StoreSetMutationProps) => void;
+        merge: (state: Partial<StateType>) => void;
     }) => MutationsSchema;
 };
 export type createStoreReturn<StateType> = Store<StateType>;
