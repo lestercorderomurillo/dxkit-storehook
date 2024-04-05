@@ -30,14 +30,14 @@ export const useBookStore = createStoreHook({
   },
   mutations: ({ state, merge, reset, set }) => ({
     addBook: (newBook) => {
-      merge({ books: [...state.books, newBook] });
+      merge({ books: [...state().books, newBook] });
     },
     removeBook: (bookId) => {
-      const updatedBooks = state.books.filter(book => book.id !== bookId);
+      const updatedBooks = state().books.filter(book => book.id !== bookId);
       set('books', updatedBooks);
     },
     updateBook: (bookId, updatedFields) => {
-      const updatedBooks = state.books.map(book => {
+      const updatedBooks = state().books.map(book => {
         if (book.id === bookId) {
           return { ...book, ...updatedFields };
         }
