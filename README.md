@@ -1,5 +1,5 @@
 # `react-signal-store`
-A high-performance, cross-component observable mutable store library engineered to minimize boilerplate code.
+Lightweight, observable store library designed for React with minimal APIs and zero boilerplate in mind.
 
 ## Installation
 
