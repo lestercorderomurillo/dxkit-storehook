@@ -1,6 +1,6 @@
 {
   "name": "react-signal-store",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Lightweight, observable store library designed for React with minimal APIs and zero boilerplate in mind.",
   "license": "MIT",
   "main": "index.ts",

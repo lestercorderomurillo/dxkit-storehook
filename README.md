@@ -17,6 +17,8 @@ yarn add react-signal-store
 First, start creating a hook for your store:
 
 ```jsx
+
+
 import { createStoreHook } from "react-signal-store";
 
 export const useBookStore = createStoreHook({
@@ -32,18 +34,14 @@ export const useBookStore = createStoreHook({
     addBook: (newBook) => {
       merge({ books: [...state().books, newBook] });
     },
-    removeBook: (bookId) => {
-      const updatedBooks = state().books.filter(book => book.id !== bookId);
-      set('books', updatedBooks);
-    },
     updateBook: (bookId, updatedFields) => {
-      const updatedBooks = state().books.map(book => {
+      const updatedBooks = { books : state().books.map(book => {
         if (book.id === bookId) {
           return { ...book, ...updatedFields };
         }
         return book;
-      });
-      set('books', updatedBooks);
+      })};
+      merge(updatedBooks);
     },
   }),
 });
