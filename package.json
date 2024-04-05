@@ -1,6 +1,6 @@
 {
-  "name": "react-observable-store",
-  "version": "1.0.0",
+  "name": "react-signal-store",
+  "version": "1.1.0",
   "description": "Fast, cross-component observable mutable store library designed with minimalism and zero boilerplate in mind.",
   "license": "MIT",
   "main": "index.ts",
@@ -16,13 +16,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lestercorderomurillo/react-observable-store.git"
+    "url": "git+https://github.com/lestercorderomurillo/react-signal-store.git"
   },
   "author": "Lester Cordero",
   "bugs": {
-    "url": "https://github.com/lestercorderomurillo/react-observable-store/issues"
+    "url": "https://github.com/lestercorderomurillo/react-signal-store/issues"
   },
-  "homepage": "https://github.com/lestercorderomurillo/react-observable-store#readme",
+  "homepage": "https://github.com/lestercorderomurillo/react-signal-store#readme",
   "dependencies": {
     "react": "^18.2.0"
   }

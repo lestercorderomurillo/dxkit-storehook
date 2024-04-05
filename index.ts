@@ -1,2 +1,2 @@
-export {useStore} from './src/hooks/useStore';
-export {createStore, createStoreHook} from './src/functions';
+export {useStore} from './lib/hooks/useStore';
+export {createStore, createStoreHook} from './lib/functions';
