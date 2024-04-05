@@ -17,6 +17,10 @@ export const isJSON = (obj: any) => {
   }
 };
 
+export const isDeepSetStateSchema = (newState: any): newState is object => {
+  return isJSON(newState) && isString(newState.path) && 'value' in newState && Object.keys(newState).length == 2;
+}
+
 export const deepMerge = (oldObj: any, newObj: any) => {
   if (typeof oldObj !== "object" || typeof newObj !== "object") {
     return oldObj;
@@ -32,6 +36,34 @@ export const deepMerge = (oldObj: any, newObj: any) => {
   return oldObj;
 };
 
+export function deepSet(src: any, path?: string, replacement?: any): any {
+  if (!path) {
+      return replacement;
+  }
+
+  const keys = path.split('.');
+  let current = src;
+
+  for (let i = 0; i < keys.length - 1; i++) {
+      const key = keys[i];
+      if (!current || typeof current !== 'object' || Array.isArray(current)) {
+          return src;
+      }
+      if (!current[key]) {
+          current[key] = {};
+      }
+      current = current[key];
+  }
+
+  const lastKey = keys[keys.length - 1];
+  if (!current || typeof current !== 'object' || Array.isArray(current)) {
+      return src;
+  }
+  current[lastKey] = replacement; 
+
+  return src;
+}
+
 export const createStore = <StateType>(params: createStoreProps<StateType>): createStoreReturn<StateType> => {
   const observable = new Observable<StateType>(params.initialState);
   return {
@@ -41,11 +73,11 @@ export const createStore = <StateType>(params: createStoreProps<StateType>): cre
       merge(newState) {
         observable.update(deepMerge(observable.current(), newState));
       },
+      set(props) {
+        observable.update(deepSet(observable.current(), props.path, props.value));
+      },
       reset() {
         observable.update(params.initialState);
-      },
-      set(newState) {
-        observable.update(newState);
       },
     }),
     onChange: (effectCallback) => observable.watch(effectCallback),

@@ -14,11 +14,9 @@ yarn add react-signal-store
 
 ## Usage
 
-First, start creating a hook for your store:
+To start, call `createStoreHook` to return a new Hook. This new hook can be accessed anywhere.
 
 ```jsx
-
-
 import { createStoreHook } from "react-signal-store";
 
 export const useBookStore = createStoreHook({
@@ -30,18 +28,22 @@ export const useBookStore = createStoreHook({
       { id: 4, title: "Pride and Prejudice", author: "Jane Austen", genre: "Romance" },
     ],
   },
-  mutations: ({ state, merge, reset, set }) => ({
+  mutations: ({ state, merge, set }) => ({
     addBook: (newBook) => {
       merge({ books: [...state().books, newBook] });
     },
     updateBook: (bookId, updatedFields) => {
-      const updatedBooks = { books : state().books.map(book => {
-        if (book.id === bookId) {
-          return { ...book, ...updatedFields };
-        }
-        return book;
-      })};
-      merge(updatedBooks);
+      merge({
+        books: state().books.map((book) => {
+          if (book.id === bookId) {
+            return { ...book, ...updatedFields };
+          }
+          return book;
+        }),
+      });
+    },
+    removeBook: (bookId) => {
+      set({ path: "books", value: state().books.filter((book) => book.id != bookId) });
     },
   }),
 });

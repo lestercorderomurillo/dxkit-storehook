@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { SelectorFunction, Store, useStoreReturn } from "../types";
+import { createStoreHook } from "../functions";
 
 export const useStore = <StateType = any, SelectionType = StateType>(
   store: Store<StateType>,
