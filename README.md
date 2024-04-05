@@ -47,7 +47,7 @@ export const useBookStore = createStoreHook({
   }),
 });
 ```
-Then you can assert:
+Then use the created hook in your components to access and modify the store state.
 
 ```jsx
 import React from 'react';
