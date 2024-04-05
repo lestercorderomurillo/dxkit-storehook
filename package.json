@@ -1,0 +1,29 @@
+{
+  "name": "react-observable-store",
+  "version": "1.0.0",
+  "description": "Fast, cross-component observable mutable store library designed with minimalism and zero boilerplate in mind.",
+  "license": "MIT",
+  "main": "index.ts",
+  "types": "lib/index.d.ts",
+  "files": [
+    "/lib"
+  ],
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lestercorderomurillo/react-observable-store.git"
+  },
+  "author": "Lester Cordero",
+  "bugs": {
+    "url": "https://github.com/lestercorderomurillo/react-observable-store/issues"
+  },
+  "homepage": "https://github.com/lestercorderomurillo/react-observable-store#readme",
+  "dependencies": {
+    "react": "^18.2.0"
+  }
+}
