@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { SelectorFunction, Store } from "../types";
+import { SelectorFunction, Store, useStoreReturn } from "../types";
 
 export const useStore = <StateType = any, SelectionType = StateType>(
   store: Store<StateType>,
   selector?: SelectorFunction<StateType, SelectionType>
-): [StateType | SelectionType, { [functionName: string]: Function }] => {
+): useStoreReturn<StateType, SelectionType> => {
   const defaultSelector = (state: StateType): StateType | SelectionType => state;
   const select = selector ? selector : defaultSelector;
-
   const [selection, setSelection] = useState<StateType | SelectionType>(select(store.state()));
 
   useEffect(() => {

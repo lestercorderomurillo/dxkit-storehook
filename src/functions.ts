@@ -1,7 +1,6 @@
 import { Observable } from "./classes/Observable";
 import { useStore } from "./hooks/useStore";
-
-import { Store, StoreManifest, SelectorFunction } from "./types";
+import { createStoreProps, createStoreReturn, createStoreHookReturn, createStoreHookProps } from "./types";
 
 export const isFunction = (value: any): value is Function => typeof value === "function";
 
@@ -9,7 +8,7 @@ export const isObject = (value: any): value is object => typeof value === "objec
 
 export const isString = (value: any): value is string => typeof value === "string";
 
-export const isJSON = (obj) => {
+export const isJSON = (obj: any) => {
   try {
     JSON.parse(obj);
     return true;
@@ -33,7 +32,7 @@ export const deepMerge = (oldObj: any, newObj: any) => {
   return oldObj;
 };
 
-export const createStore = <StateType = any,>(params: StoreManifest<StateType>): Store<StateType> => {
+export const createStore = <StateType>(params: createStoreProps<StateType>): createStoreReturn<StateType> => {
   const observable = new Observable<StateType>(params.initialState);
   return {
     state: () => observable.current(),
@@ -53,14 +52,7 @@ export const createStore = <StateType = any,>(params: StoreManifest<StateType>):
   };
 };
 
-export const createStoreHook = <StateType = any, SelectionType = StateType>(
-  params: StoreManifest<StateType>
-): (() => [
-  SelectionType,
-  {
-    [functionName: string]: Function;
-  },
-]) => {
+export const createStoreHook = <StateType, SelectionType = StateType>(params: createStoreHookProps<StateType>): createStoreHookReturn<StateType, SelectionType> => {
   const store = createStore(params);
-  return (selector?: SelectorFunction) => useStore(store, selector);
+  return (selector) => useStore(store, selector);
 };
