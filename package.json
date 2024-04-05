@@ -1,6 +1,6 @@
 {
   "name": "react-signal-store",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "description": "Fast, cross-component observable mutable store library designed with minimalism and zero boilerplate in mind.",
   "license": "MIT",
   "main": "index.ts",
