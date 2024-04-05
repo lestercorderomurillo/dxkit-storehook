@@ -1,13 +1,14 @@
 # `react-signal-store`
-Fast, cross-component observable mutable store library designed with minimalism and zero boilerplate in mind.
+A high-performance, cross-component observable mutable store library engineered to minimize boilerplate code.
 
 ## Installation
 
-```sh
 # npm
+```sh
 npm install react-signal-store
-
+```
 # Yarn
+```sh
 yarn add react-signal-store
 ```
 
