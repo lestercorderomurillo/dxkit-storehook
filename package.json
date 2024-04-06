@@ -1,6 +1,6 @@
 {
   "name": "react-one-source",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Lightweight, observable store library for React. Made with minimal APIs and zero boilerplate in mind.",
   "license": "MIT",
   "main": "index.ts",
@@ -16,13 +16,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lestercorderomurillo/react-signal-store.git"
+    "url": "git+https://github.com/lestercorderomurillo/react-one-source.git"
   },
   "author": "Lester Cordero Murillo",
   "bugs": {
-    "url": "https://github.com/lestercorderomurillo/react-signal-store/issues"
+    "url": "https://github.com/lestercorderomurillo/react-one-source/issues"
   },
-  "homepage": "https://github.com/lestercorderomurillo/react-signal-store#readme",
+  "homepage": "https://github.com/lestercorderomurillo/react-one-source#readme",
   "dependencies": {
     "react": "^18.2.0"
   }
