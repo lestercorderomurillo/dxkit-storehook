@@ -1,5 +1,5 @@
 export type Store<StateType = any> = {
-    state: () => StateType | undefined;
+    current: () => StateType | undefined;
     subscribe: (callback: (state: StateType) => any) => any;
     mutations: MutationsSchema;
 };
@@ -27,7 +27,7 @@ export type MutationOperations<StateType> = {
     merge: (state: Partial<StateType>) => void;
 };
 export type SubscriptionsOperations<StateType> = {
-    state: () => StateType;
+    current: () => StateType;
 };
 export type createStoreProps<StateType = any> = {
     initialState: StateType | undefined;

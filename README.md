@@ -1,15 +1,15 @@
-# `react-signal-store`
+# `react-one-source`
 Lightweight, observable store library designed for React with minimal APIs and zero boilerplate in mind.
 
 ## Installation
 
 # npm
 ```sh
-npm install react-signal-store
+npm install react-one-source
 ```
 # Yarn
 ```sh
-yarn add react-signal-store
+yarn add react-one-source
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ yarn add react-signal-store
 To start, call `createStoreHook` to return a new Hook. This new hook can be accessed anywhere.
 
 ```jsx
-import { createStoreHook } from "react-signal-store";
+import { createStoreHook } from "react-one-source";
 
 export const useBookStore = createStoreHook({
   initialState: {

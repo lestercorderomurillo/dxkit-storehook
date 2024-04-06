@@ -67,7 +67,7 @@ export const deepSet = (src: any, path?: string, replacement?: any): any => {
 export const createStore = <StateType>(params: createStoreProps<StateType>): createStoreReturn<StateType> => {
   const value = new Observable<StateType>(params.initialState);
   const subscriptionsSchema = params.subscriptions({
-    state: () => value.current()
+    current: () => value.current()
   });
   const subscriptions = new Observable<Subscriptions>({
     onRead: subscriptionsSchema.onRead ?? [],
@@ -80,7 +80,7 @@ export const createStore = <StateType>(params: createStoreProps<StateType>): cre
     subscriptions.current().onUpdate.forEach(callbackFn => callbackFn(value.current()));
   }
   return {
-    state: () => value.current(),
+    current: () => value.current(),
     subscribe: (effectCallback) => value.watch(effectCallback),
     mutations: params.mutations({
       current(){

@@ -1,5 +1,5 @@
 export type Store<StateType = any> = {
-    state: () => StateType | undefined;
+    current: () => StateType | undefined;
     subscribe: (callback: (state: StateType) => any) => any;
     mutations: MutationsSchema;
 };
@@ -14,6 +14,7 @@ export type SubscriptionsSchema = {
   willUpdate?: Function[];
 };
 
+// convert to object with any function name...
 export type Subscriptions = {
   onRead: any[];
   onUpdate: any[];
@@ -30,7 +31,7 @@ export type MutationOperations<StateType> = {
 }
 
 export type SubscriptionsOperations<StateType> = {
-  state: () => StateType;
+  current: () => StateType;
 }
 
 export type createStoreProps<StateType = any> = {

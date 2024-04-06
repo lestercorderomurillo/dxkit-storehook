@@ -1,7 +1,7 @@
 {
-  "name": "react-signal-store",
-  "version": "1.2.9",
-  "description": "Lightweight, observable store library designed for React with minimal APIs and zero boilerplate in mind.",
+  "name": "react-one-source",
+  "version": "0.0.1",
+  "description": "Lightweight, observable store library for React. Made with minimal APIs and zero boilerplate in mind.",
   "license": "MIT",
   "main": "index.ts",
   "types": "lib/index.d.ts",

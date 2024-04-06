@@ -7,7 +7,7 @@ export const useStore = <StateType = any, SelectionType = StateType>(
 ): useStoreReturn<StateType, SelectionType> => {
   const defaultSelector = (state: StateType): StateType | SelectionType => state;
   const select = selector ? selector : defaultSelector;
-  const [selection, setSelection] = useState<StateType | SelectionType>(select(store.state()));
+  const [selection, setSelection] = useState<StateType | SelectionType>(select(store.current()));
 
   useEffect(() => {
     return store.subscribe((newState: StateType) => {
