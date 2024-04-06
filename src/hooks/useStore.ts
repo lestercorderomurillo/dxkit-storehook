@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { SelectorFunction, Store, useStoreReturn } from "../types";
-import { createStoreHook } from "../functions";
 
 export const useStore = <StateType = any, SelectionType = StateType>(
   store: Store<StateType>,
@@ -11,7 +10,7 @@ export const useStore = <StateType = any, SelectionType = StateType>(
   const [selection, setSelection] = useState<StateType | SelectionType>(select(store.state()));
 
   useEffect(() => {
-    return store.onChange((newState: StateType) => {
+    return store.subscribe((newState: StateType) => {
       setSelection(JSON.parse(JSON.stringify(select(newState))));
     });
   }, []);

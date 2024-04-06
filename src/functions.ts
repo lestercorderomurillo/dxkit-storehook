@@ -1,6 +1,6 @@
 import { Observable } from "./classes/Observable";
 import { useStore } from "./hooks/useStore";
-import { createStoreProps, createStoreReturn, createStoreHookReturn, createStoreHookProps } from "./types";
+import { createStoreProps, createStoreReturn, createStoreHookReturn, createStoreHookProps, SubscriptionsSchema, Subscriptions } from "./types";
 
 export const isFunction = (value: any): value is Function => typeof value === "function";
 
@@ -36,7 +36,7 @@ export const deepMerge = (oldObj: any, newObj: any) => {
   return oldObj;
 };
 
-export function deepSet(src: any, path?: string, replacement?: any): any {
+export const deepSet = (src: any, path?: string, replacement?: any): any => {
   if (!path) {
       return replacement;
   }
@@ -65,22 +65,38 @@ export function deepSet(src: any, path?: string, replacement?: any): any {
 }
 
 export const createStore = <StateType>(params: createStoreProps<StateType>): createStoreReturn<StateType> => {
-  const observable = new Observable<StateType>(params.initialState);
+  const value = new Observable<StateType>(params.initialState);
+  const subscriptionsSchema = params.subscriptions({
+    state: () => value.current()
+  });
+  const subscriptions = new Observable<Subscriptions>({
+    onRead: subscriptionsSchema.onRead ?? [],
+    onUpdate: subscriptionsSchema.onUpdate ?? [],
+    willUpdate: subscriptionsSchema.willUpdate ?? [],
+  });
+  const dispatch = (callback: Function) => {
+    subscriptions.current().willUpdate.forEach(callbackFn => callbackFn(value.current()));
+    callback();
+    subscriptions.current().onUpdate.forEach(callbackFn => callbackFn(value.current()));
+  }
   return {
-    state: () => observable.current(),
+    state: () => value.current(),
+    subscribe: (effectCallback) => value.watch(effectCallback),
     mutations: params.mutations({
-      state: () => observable.current(),
-      merge(newState) {
-        observable.update(deepMerge(observable.current(), newState));
+      current(){
+        subscriptions.current().onRead.forEach(callbackFn => callbackFn(value.current()));
+        return value.current();
       },
-      set(props) {
-        observable.update(deepSet(observable.current(), props.path, props.value));
+      merge(newState) {
+        dispatch(() => value.update(deepMerge(value.current(), newState)));
+      },
+      set(props) {;
+        dispatch(() => value.update(deepSet(value.current(), props.path, props.value)));
       },
       reset() {
-        observable.update(params.initialState);
+        dispatch(() => value.update(params.initialState));
       },
-    }),
-    onChange: (effectCallback) => observable.watch(effectCallback),
+    })
   };
 };
 
