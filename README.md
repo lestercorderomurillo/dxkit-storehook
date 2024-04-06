@@ -1,15 +1,15 @@
-# `fastdx-storehook`
+# `dxkit-storehook`
 Lightweight, observable store library. Made for React with minimal APIs and zero boilerplate in mind, with focus on providing a good developer experience.
 
 ## Installation
 
 # npm
 ```sh
-npm install fastdx-storehook
+npm install dxkit-storehook
 ```
 # Yarn
 ```sh
-yarn add fastdx-storehook
+yarn add dxkit-storehook
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ yarn add fastdx-storehook
 To start, call `createStoreHook` to return a new Hook. This new hook can be accessed anywhere.
 
 ```jsx
-import { createStoreHook } from "fastdx-storehook";
+import { createStoreHook } from "dxkit-storehook";
 
 export const useBookStore = createStoreHook({
   initialState: {
