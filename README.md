@@ -1,5 +1,13 @@
-# `Introducing Storehook from dxKit`
-Lightweight, observable store library. Made for React with minimal APIs and zero boilerplate in mind, with focus on providing a good developer experience.
+# `@dxKit/Storehook`
+Observable store library. Made for React with minimal APIs and zero boilerplate in mind, with focus on providing a good developer experience.
+
+# Features
+- [x] (Predictable global mutable state)
+- [x] (Force developers to write optimistic updates by default)
+- [x] (Hook-like usage for seamless integration with React)
+- [x] (Signal-based, providing high performance by default)
+- [x] (100% Typesafe documentation)
+- [x] (Lightweight, 1KB size bundle)
 
 ## Installation
 
