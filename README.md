@@ -1,4 +1,4 @@
-# `dxkit-storehook`
+# `Introducing Storehook from dxKit`
 Lightweight, observable store library. Made for React with minimal APIs and zero boilerplate in mind, with focus on providing a good developer experience.
 
 ## Installation
