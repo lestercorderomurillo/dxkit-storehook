@@ -1,6 +1,6 @@
 import { Observable } from "./classes/Observable";
 import { useStore } from "./hooks/useStore";
-import { createStoreProps, createStoreReturn, createStoreHookReturn, createStoreHookProps, SubscriptionsSchema, Subscriptions } from "./types";
+import { createStoreProps, createStoreReturn, createStoreHookReturn, createStoreHookProps, Subscriptions, Subscriptions } from "./types";
 
 export const isFunction = (value: any): value is Function => typeof value === "function";
 

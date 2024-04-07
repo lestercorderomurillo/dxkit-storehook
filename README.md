@@ -1,23 +1,24 @@
-# `@dxKit/Storehook`
-Observable store library. Made for React with minimal APIs and zero boilerplate in mind, with focus on providing a good developer experience.
+# `Reflow`
+Reflow is an observable store library designed for React, aimed at minimizing boilerplate while maximizing developer experience.
 
-# Features
-- [x] (Predictable global mutable state)
-- [x] (Force developers to write optimistic updates by default)
-- [x] (Hook-like usage for seamless integration with React)
-- [x] (Signal-based, providing high performance by default)
-- [x] (100% Typesafe documentation)
-- [x] (Lightweight, 1KB size bundle)
+## Features
+- **Predictable global mutable state**: Provides a centralized state management solution.
+- **Optimistic updates by default**: Encourages developers to write optimistic updates.
+- **Hook-like usage for seamless integration with React Components**: Easily integrate with React components using hooks.
+- **Signal-based for high performance**: Offers high performance through a signal-based architecture.
+- **100% Typesafe documentation**: Ensures type safety with comprehensive documentation.
+- **Lightweight (1KB bundle size)**: Keeps your bundle size minimal for better performance.
+
 
 ## Installation
 
 # npm
 ```sh
-npm install dxkit-storehook
+npm install reflow
 ```
 # Yarn
 ```sh
-yarn add dxkit-storehook
+yarn add reflow
 ```
 
 ## Usage
@@ -25,7 +26,7 @@ yarn add dxkit-storehook
 To start, call `createStoreHook` to return a new Hook. This new hook can be accessed anywhere.
 
 ```jsx
-import { createStoreHook } from "dxkit-storehook";
+import { createStoreHook } from "reflow";
 
 export const useBookStore = createStoreHook({
   initialState: {

@@ -1,24 +1,20 @@
+export type UnSubscribeFunction = any;
+
 export type Store<StateType = any> = {
     current: () => StateType | undefined;
-    subscribe: (callback: (state: StateType) => any) => any;
-    mutations: MutationsSchema;
+    subscribe: (callback: (state: StateType) => any) => UnSubscribeFunction;
+    mutations: Mutations;
+};
+
+export type Subscriptions = {
+  [key in string]: {
+    willCommit: <MutationType = any>(mutation: MutationType) => void;
+    didCommit: <MutationType = any>(mutated: MutationType) => void;
+  };
 };
   
-export type MutationsSchema = {
+export type Mutations = {
   [actionName: string]: Function;
-};
-
-export type SubscriptionsSchema = {
-  onRead?: Function[];
-  onUpdate?: Function[];
-  willUpdate?: Function[];
-};
-
-// convert to object with any function name...
-export type Subscriptions = {
-  onRead: any[];
-  onUpdate: any[];
-  willUpdate: any[];
 };
 
 export type StoreSetMutationProps = {path?: string, value: any};
@@ -28,6 +24,7 @@ export type MutationOperations<StateType> = {
   reset: () => void;
   set: (setParams: StoreSetMutationProps) => void;
   merge: (state: Partial<StateType>) => void;
+  optimistic: (key: string, value: any) => any;
 }
 
 export type SubscriptionsOperations<StateType> = {
@@ -36,8 +33,8 @@ export type SubscriptionsOperations<StateType> = {
 
 export type createStoreProps<StateType = any> = {
   initialState: StateType | undefined;
-  mutations?: (operations: MutationOperations<StateType>) => MutationsSchema;
-  subscriptions?: (operations: SubscriptionsOperations<StateType>) => SubscriptionsSchema;
+  mutations?: (operations: MutationOperations<StateType>) => Mutations;
+  subscriptions?: (operations: SubscriptionsOperations<StateType>) => Subscriptions;
 };
 
 export type createStoreReturn<StateType> = Store<StateType>;
