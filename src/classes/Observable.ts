@@ -4,7 +4,7 @@ export class Observable<ObservedValueType = any> {
     private value: ObservedValueType;
     private signal: Signal;
   
-    constructor(value: ObservedValueType) {
+    constructor(value?: ObservedValueType) {
       this.signal = new Signal<ObservedValueType>();
       this.update(value);
     }

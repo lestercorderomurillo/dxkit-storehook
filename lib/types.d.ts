@@ -1,20 +1,18 @@
+export type UnSubscribeFunction = any;
 export type Store<StateType = any> = {
     current: () => StateType | undefined;
-    subscribe: (callback: (state: StateType) => any) => any;
-    mutations: MutationsSchema;
+    subscribe: (callback: (state: StateType) => any) => UnSubscribeFunction;
+    mutations: Mutations;
 };
-export type MutationsSchema = {
-    [actionName: string]: Function;
+export type Subscriptions<StateType = any> = {
+    [subscriptionName in keyof Store<StateType>['mutations']]?: SubscriptionsTypes;
 };
-export type SubscriptionsSchema = {
-    onRead?: Function[];
-    onUpdate?: Function[];
-    willUpdate?: Function[];
+export type SubscriptionsTypes = {
+    willCommit?: <MutationType = any>(mutation: MutationType) => void;
+    didCommit?: <MutationType = any>(mutation: MutationType) => void;
 };
-export type Subscriptions = {
-    onRead: any[];
-    onUpdate: any[];
-    willUpdate: any[];
+export type Mutations = {
+    [mutationName: string]: (payload?: any) => any;
 };
 export type StoreSetMutationProps = {
     path?: string;
@@ -25,14 +23,17 @@ export type MutationOperations<StateType> = {
     reset: () => void;
     set: (setParams: StoreSetMutationProps) => void;
     merge: (state: Partial<StateType>) => void;
+    optimistic: (key: string, value: any) => any;
 };
 export type SubscriptionsOperations<StateType> = {
     current: () => StateType;
+    forward: <ForwardedType = any>(key: string, value: ForwardedType) => void;
+    undo: () => void;
 };
 export type createStoreProps<StateType = any> = {
     initialState: StateType | undefined;
-    mutations?: (operations: MutationOperations<StateType>) => MutationsSchema;
-    subscriptions?: (operations: SubscriptionsOperations<StateType>) => SubscriptionsSchema;
+    mutations?: (operations: MutationOperations<StateType>) => Mutations;
+    subscriptions?: (operations: SubscriptionsOperations<StateType>) => Subscriptions<StateType>;
 };
 export type createStoreReturn<StateType> = Store<StateType>;
 export type useStoreReturn<StateType = any, SelectionType = StateType> = [StateType | SelectionType, {

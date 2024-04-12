@@ -1,3 +1,5 @@
+import { createStoreHook } from "./functions";
+
 export type UnSubscribeFunction = any;
 
 export type Store<StateType = any> = {
@@ -6,15 +8,17 @@ export type Store<StateType = any> = {
     mutations: Mutations;
 };
 
-export type Subscriptions = {
-  [key in string]: {
-    willCommit: <MutationType = any>(mutation: MutationType) => void;
-    didCommit: <MutationType = any>(mutated: MutationType) => void;
-  };
+export type Subscriptions<StateType = any> = {
+  [subscriptionName in keyof Store<StateType>['mutations']]?: SubscriptionsTypes;
+};
+
+export type SubscriptionsTypes = {
+  willCommit?: <MutationType = any>(mutation: MutationType) => void;
+  didCommit?: <MutationType = any>(mutation: MutationType) => void;
 };
   
 export type Mutations = {
-  [actionName: string]: Function;
+  [mutationName: string]: (payload?: any) => any;
 };
 
 export type StoreSetMutationProps = {path?: string, value: any};
@@ -29,12 +33,14 @@ export type MutationOperations<StateType> = {
 
 export type SubscriptionsOperations<StateType> = {
   current: () => StateType;
+  forward: <ForwardedType = any>(key: string, value: ForwardedType) => void;
+  undo: () => void;
 }
 
 export type createStoreProps<StateType = any> = {
   initialState: StateType | undefined;
   mutations?: (operations: MutationOperations<StateType>) => Mutations;
-  subscriptions?: (operations: SubscriptionsOperations<StateType>) => Subscriptions;
+  subscriptions?: (operations: SubscriptionsOperations<StateType>) => Subscriptions<StateType>;
 };
 
 export type createStoreReturn<StateType> = Store<StateType>;

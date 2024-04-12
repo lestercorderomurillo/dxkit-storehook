@@ -1,6 +1,6 @@
 import { Observable } from "./classes/Observable";
 import { useStore } from "./hooks/useStore";
-import { createStoreProps, createStoreReturn, createStoreHookReturn, createStoreHookProps, Subscriptions, Subscriptions } from "./types";
+import { createStoreProps, createStoreReturn, createStoreHookReturn, createStoreHookProps, SubscriptionsTypes } from "./types";
 
 export const isFunction = (value: any): value is Function => typeof value === "function";
 
@@ -21,14 +21,14 @@ export const isDeepSetStateSchema = (newState: any): newState is object => {
   return isJSON(newState) && isString(newState.path) && 'value' in newState && Object.keys(newState).length == 2;
 }
 
-export const deepMerge = (oldObj: any, newObj: any) => {
+export const deepMerge = ({oldObj, newObj}: {oldObj: any, newObj: any}) => {
   if (typeof oldObj !== "object" || typeof newObj !== "object") {
     return oldObj;
   }
 
   for (const key in newObj) {
     if (newObj[key] !== null && typeof newObj[key] === "object") {
-      oldObj[key] = deepMerge(oldObj[key] ?? {}, newObj[key]);
+      oldObj[key] = deepMerge({oldObj: oldObj[key] ?? {}, newObj: newObj[key]});
     } else {
       oldObj[key] = newObj[key];
     }
@@ -36,8 +36,8 @@ export const deepMerge = (oldObj: any, newObj: any) => {
   return oldObj;
 };
 
-export const deepSet = (src: any, path?: string, replacement?: any): any => {
-  if (!path) {
+export const deepSet = ({src, path, replacement}): any => {
+  if (!path || path == '' || path == null) {
       return replacement;
   }
 
@@ -66,37 +66,91 @@ export const deepSet = (src: any, path?: string, replacement?: any): any => {
 
 export const createStore = <StateType>(params: createStoreProps<StateType>): createStoreReturn<StateType> => {
   const value = new Observable<StateType>(params.initialState);
-  const subscriptionsSchema = params.subscriptions({
-    current: () => value.current()
+  const snapshot = new Observable<StateType>();
+  const optimisticValues = new Observable<any>({});
+  const mutation = new Observable<{name: string; payload: any;}>();
+  const dispatch = async (fn: Function) => {
+    if(snapshot.current() == undefined){
+      snapshot.update(value.current());
+    }
+    await fn();
+    await subscriptions[mutation.current().name].willCommit(mutation.current().payload);
+    optimisticValues.update({});
+    await subscriptions[mutation.current().name].didCommit(mutation.current().payload);
+    mutation.update(undefined);
+    snapshot.update(undefined);
+  };
+  const subscriptions = params.subscriptions({
+    current() {
+      return value.current();
+    },
+    forward(key, value) {
+      optimisticValues.update(deepSet({
+        path: key,
+        src: optimisticValues.current(),
+        replacement: value
+      }));
+      mutations[mutation.current().name](mutation.current().payload);
+    },
+    undo() {
+      value.update(snapshot.current());
+    },
   });
-  const subscriptions = new Observable<Subscriptions>({
-    onRead: subscriptionsSchema.onRead ?? [],
-    onUpdate: subscriptionsSchema.onUpdate ?? [],
-    willUpdate: subscriptionsSchema.willUpdate ?? [],
+  const mutations = params.mutations({
+    current(){
+      return value.current();
+    },
+    merge(newState) {
+      dispatch(() => {
+        value.update(deepMerge({
+          oldObj: value.current(),
+          newObj: newState
+        }));
+      });
+    },
+    set(props) {
+      dispatch(() => {
+        value.update(deepSet({
+          path: props.path,
+          src: value.current(),
+          replacement: props.value,
+        }));
+      });
+    },
+    reset() {
+      dispatch(() => {
+        value.update(params.initialState);
+      });
+    },
+    optimistic(key, value) {
+      if(optimisticValues[key]){
+        return optimisticValues[key];
+      }
+      return value;
+    },
   });
-  const dispatch = (callback: Function) => {
-    subscriptions.current().willUpdate.forEach(callbackFn => callbackFn(value.current()));
-    callback();
-    subscriptions.current().onUpdate.forEach(callbackFn => callbackFn(value.current()));
-  }
+
+  const mutationsProxy = new Proxy(mutations, {
+    get(object: any, functionName: string) {
+      const origMethod = object[functionName];
+      if (typeof origMethod === 'function') {
+        return function (...args) {
+          mutation.update({
+            name: functionName,
+            payload: args[0]
+          });
+          return origMethod.apply(this, args);
+        };
+      } else {
+        return origMethod;
+      }
+    }
+  });
+  
   return {
     current: () => value.current(),
     subscribe: (effectCallback) => value.watch(effectCallback),
-    mutations: params.mutations({
-      current(){
-        subscriptions.current().onRead.forEach(callbackFn => callbackFn(value.current()));
-        return value.current();
-      },
-      merge(newState) {
-        dispatch(() => value.update(deepMerge(value.current(), newState)));
-      },
-      set(props) {;
-        dispatch(() => value.update(deepSet(value.current(), props.path, props.value)));
-      },
-      reset() {
-        dispatch(() => value.update(params.initialState));
-      },
-    })
+    mutations: mutationsProxy
   };
 };
 

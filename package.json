@@ -1,6 +1,6 @@
 {
   "name": "reflow",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Observable global state management library for React. Made with minimal APIs and zero boilerplate in mind.",
   "license": "MIT",
   "main": "index.ts",
