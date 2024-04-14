@@ -1,55 +1,69 @@
-# `Reflow`
-Reflow is an observable store library designed for React, aimed at minimizing boilerplate while maximizing developer experience.
+# `zen-state`
+zen-state is an observable store library designed for React, aimed at minimizing boilerplate while maximizing developer experience.
 
 ## Features
-- **Predictable global mutable state**: Provides a centralized state management solution.
-- **Optimistic updates by default**: Encourages developers to write optimistic updates.
-- **Hook-like usage for seamless integration with React Components**: Easily integrate with React components using hooks.
-- **Signal-based for high performance**: Offers high performance through a signal-based architecture.
-- **100% Typesafe documentation**: Ensures type safety with comprehensive documentation.
-- **Lightweight (1KB bundle size)**: Keeps your bundle size minimal for better performance.
+- **Centralized State Management**: Provides a predictable global mutable state and encourages optimistic updates.
+- **Seamless React Integration**: Easily integrates with React components using hooks for a lightweight footprint.
+- **High Performance**: Utilizes a signal-based architecture for efficiency with minimal bundle size (1KB).
+- **Type-Safe Documentation**: Ensures 100% type safety through comprehensive documentation.
 
 
 ## Installation
 
 - npm
 ```sh
-npm install reflow
+npm install zen-state
 ```
 - Yarn
 ```sh
-yarn add reflow
+yarn add zen-state
 ```
 
 ## Usage
 
-To start, call `createStoreHook` to return a new Hook. This new hook can be accessed anywhere.
+To start, call `createStore` to return a new Hook. This new hook can be accessed anywhere.
 
 ```jsx
-import { createStoreHook } from "reflow";
+import { createStore } from 'zen-state';
+import { PrismaClient } from '@prisma/client';
 
-export const useBookStore = createStoreHook({
-  initialState: [],
-  mutations: ({current, set, optimistic}) => ({
-    addBook: ({book}) => set({value: [...current(), {...book, id: optimistic('id', 1000)}]})
+const prisma = new PrismaClient();
+
+type Book = {
+  id: number;
+  title: string;
+  author: string;
+};
+
+export const useBookStore = createStoreHook<Book[]>({
+  initialState: [
+    { id: 1000, author: 'Lester', title: 'TestBook' }
+  ],
+  mutations: ({ current, set, optimistic }) => ({
+    addBook: ({ book }) => set({ value: [...current(), { ...book, id: optimistic('id', 9999) }] }),
   }),
-  subscriptions: ({forward, undo}) => ({
+  subscriptions: ({ forward, rollback }) => ({
     addBook: {
-      willCommit: async ({book}: any) => {
-        const response = await insertBook(book);
-        if(response.status == 200){
-          console.log(`Book with id ${id} was inserted.`);
-          forward('id', response.value);
-        }else{
-          undo();
+      willCommit: async (book: Book) => {
+        try {
+          const res = await prisma.book.create({
+            data: {
+              title: book.title,
+              author: book.author
+            }
+          });
+          forward('id', res.id);
+        } catch (error) {
+          console.error('Error inserting book:', error);
+          rollback();
         }
       },
-      didCommit: ({book}: any) => {
-        console.log(book);
-      }
-    }
-  })
-});;
+      didCommit: (book: Book) => {
+        console.log(`Book with id ${book.id} was inserted.`);
+      },
+    },
+  }),
+});
 ```
 Then use the created hook in your components to access and modify the store state.
 

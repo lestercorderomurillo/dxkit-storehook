@@ -4,12 +4,12 @@ export type Store<StateType = any> = {
     subscribe: (callback: (state: StateType) => any) => UnSubscribeFunction;
     mutations: Mutations;
 };
-export type Subscriptions<StateType = any> = {
+export type Subscriptions<StateType> = {
     [subscriptionName in keyof Store<StateType>['mutations']]?: SubscriptionsTypes;
 };
 export type SubscriptionsTypes = {
-    willCommit?: <MutationType = any>(mutation: MutationType) => void;
-    didCommit?: <MutationType = any>(mutation: MutationType) => void;
+    willCommit?: (mutation: any) => void;
+    didCommit?: (mutation: any) => void;
 };
 export type Mutations = {
     [mutationName: string]: (payload?: any) => any;
@@ -28,7 +28,7 @@ export type MutationOperations<StateType> = {
 export type SubscriptionsOperations<StateType> = {
     current: () => StateType;
     forward: <ForwardedType = any>(key: string, value: ForwardedType) => void;
-    undo: () => void;
+    rollback: () => void;
 };
 export type createStoreProps<StateType = any> = {
     initialState: StateType | undefined;

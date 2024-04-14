@@ -92,7 +92,7 @@ export const createStore = <StateType>(params: createStoreProps<StateType>): cre
       }));
       mutations[mutation.current().name](mutation.current().payload);
     },
-    undo() {
+    rollback() {
       value.update(snapshot.current());
     },
   });

@@ -1,6 +1,6 @@
 {
-  "name": "reflow",
-  "version": "0.0.2",
+  "name": "zen-state",
+  "version": "0.0.1",
   "description": "Observable global state management library for React. Made with minimal APIs and zero boilerplate in mind.",
   "license": "MIT",
   "main": "index.ts",
@@ -16,13 +16,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lestercorderomurillo/reflow.git"
+    "url": "git+https://github.com/lestercorderomurillo/zen-state.git"
   },
   "author": "Lester Cordero Murillo",
   "bugs": {
-    "url": "https://github.com/lestercorderomurillo/reflow/issues"
+    "url": "https://github.com/lestercorderomurillo/zen-state/issues"
   },
-  "homepage": "https://github.com/lestercorderomurillo/reflow#readme",
+  "homepage": "https://github.com/lestercorderomurillo/zen-state#readme",
   "dependencies": {
     "react": "^18.2.0"
   }
