@@ -1,11 +1,13 @@
 # `zen-state`
-zen-state is an observable store library designed for React, aimed at minimizing boilerplate while maximizing developer experience.
+zen-state is an observable global state management library designed for React, aimed at minimizing boilerplate while maximizing developer experience.
 
-## Features
-- **Centralized State Management**: Provides a predictable global mutable state and encourages optimistic updates.
-- **Seamless React Integration**: Easily integrates with React components using hooks for a lightweight footprint.
-- **High Performance**: Utilizes a signal-based architecture for efficiency with minimal bundle size (1KB).
+## List of features
+- **Centralized State Management**: Provides a predictable global state reducer.
+- **Best Practiques by Default**: Encourages developers to easily write optimistic updates by default.
+- **Seamless React Integration**: Easily integrates with React Components using hooks.
+- **High Performance**: Utilizes the modern signal-based architecture for efficiency.
 - **Type-Safe Documentation**: Ensures 100% type safety through comprehensive documentation.
+- **Low JS Bundle**: Less than 1KB footprint on your project bundle.
 
 
 ## Installation
@@ -21,7 +23,7 @@ yarn add zen-state
 
 ## Usage
 
-To start, call `createStore` to return a new Hook. This new hook can be accessed anywhere.
+To begin, invoke the `createStoreHook` function to generate a new Hook. This fresh hook will be accessible universally, containing an array with your store state and an object with mutations. Integration with your ORM system, as well as fetch/submit operations, will be straightforward.
 
 ```jsx
 import { createStore } from 'zen-state';
@@ -65,7 +67,7 @@ export const useBookStore = createStoreHook<Book[]>({
   }),
 });
 ```
-Then use the created hook in your components to access and modify the store state.
+Then use the created hook in your components to access and call the mutations defined on your store.
 
 ```jsx
 import React from 'react';
