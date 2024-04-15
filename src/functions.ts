@@ -1,44 +1,72 @@
 import { Observable } from "./classes/Observable";
 import { useStore } from "./hooks/useStore";
-import { createStoreProps, createStoreReturn, createStoreHookReturn, createStoreHookProps, SubscriptionsTypes } from "./types";
+import { createStoreProps, createStoreReturn, createStoreHookReturn, createStoreHookProps, SubscriptionsTypes, DeepMergeOptions, DeepSetOptions, MutationDispatch } from "./types";
 
+/**
+ * Checks if the given value is a function.
+ * @param {any} value The value to check.
+ * @returns {boolean} True if the value is a function, otherwise false.
+ */
 export const isFunction = (value: any): value is Function => typeof value === "function";
 
+/**
+ * Checks if the given value is an object.
+ * @param {any} value The value to check.
+ * @returns {boolean} True if the value is an object, otherwise false.
+ */
 export const isObject = (value: any): value is object => typeof value === "object";
 
+/**
+ * Checks if the given value is a string.
+ * @param {any} value The value to check.
+ * @returns {boolean} True if the value is a string, otherwise false.
+ */
 export const isString = (value: any): value is string => typeof value === "string";
 
-export const isJSON = (obj: any) => {
+/**
+ * Checks if the given object is valid JSON.
+ * @param {any} value The object to check.
+ * @returns {boolean} True if the object is valid JSON, otherwise false.
+ */
+export const isJSON = (value: any): boolean => {
   try {
-    JSON.parse(obj);
+    JSON.parse(value);
     return true;
   } catch (e) {
     return false;
   }
 };
-
-export const isDeepSetStateSchema = (newState: any): newState is object => {
-  return isJSON(newState) && isString(newState.path) && 'value' in newState && Object.keys(newState).length == 2;
-}
-
-export const deepMerge = ({oldObj, newObj}: {oldObj: any, newObj: any}) => {
-  if (typeof oldObj !== "object" || typeof newObj !== "object") {
-    return oldObj;
+/**
+ * Merges two objects deeply.
+ * @param {DeepMergeOptions} options - The options for the merge operation.
+ * @returns {any} The merged object.
+ */
+export const deepMerge = ({src, dest}: DeepMergeOptions): any => {
+  if (typeof src !== "object" || typeof dest !== "object") {
+    return src;
   }
 
-  for (const key in newObj) {
-    if (newObj[key] !== null && typeof newObj[key] === "object") {
-      oldObj[key] = deepMerge({oldObj: oldObj[key] ?? {}, newObj: newObj[key]});
-    } else {
-      oldObj[key] = newObj[key];
+  for (const key in dest) {
+    if (Object.prototype.hasOwnProperty.call(dest, key)) {
+      if (dest[key] !== null && typeof dest[key] === "object") {
+        src[key] = deepMerge({src: src[key] ?? {}, dest: dest[key]});
+      } else {
+        src[key] = dest[key];
+      }
     }
   }
-  return oldObj;
+  return src;
 };
 
-export const deepSet = ({src, path, replacement}): any => {
+/**
+ * Sets a deeply nested property in an object.
+ * @param {object} src The source object.
+ * @param {any} value The value to set.
+ * @returns {any} The modified object.
+ */
+export const deepSet = ({path, src, value}: DeepSetOptions): any => {
   if (!path || path == '' || path == null) {
-      return replacement;
+      return value;
   }
 
   const keys = path.split('.');
@@ -59,28 +87,46 @@ export const deepSet = ({src, path, replacement}): any => {
   if (!current || typeof current !== 'object' || Array.isArray(current)) {
       return src;
   }
-  current[lastKey] = replacement; 
+  current[lastKey] = value; 
 
   return src;
 }
 
-export const createStore = <StateType>(params: createStoreProps<StateType>): createStoreReturn<StateType> => {
-  const value = new Observable<StateType>(params.initialState);
+/**
+ * Creates a new store instance with the specified initial state.
+ * @template StateType - The type of the state managed by the store.
+ * @param {createStoreProps<StateType>} storeConfig Configuration object for creating the store.
+ * @returns {createStoreReturn<StateType>} An object containing the store instance.
+ */
+export const createStore = <StateType = any>(storeConfig: createStoreProps<StateType>): createStoreReturn<StateType> => {
+  const value = new Observable<StateType>(storeConfig.initialState);
   const snapshot = new Observable<StateType>();
   const optimisticValues = new Observable<any>({});
-  const mutation = new Observable<{name: string; payload: any;}>();
+  const mutation = new Observable<MutationDispatch>();
+
   const dispatch = async (fn: Function) => {
     if(snapshot.current() == undefined){
       snapshot.update(value.current());
     }
+    const subscription = subscriptions[mutation.current().name];
+
     await fn();
-    await subscriptions[mutation.current().name].willCommit(mutation.current().payload);
+
+    if(subscription){
+      await subscription.willCommit?.(mutation.current().payload);
+    }
+
     optimisticValues.update({});
-    await subscriptions[mutation.current().name].didCommit(mutation.current().payload);
+
+    if(subscription){
+      await subscription.didCommit?.(mutation.current().payload);
+    }
+
     mutation.update(undefined);
     snapshot.update(undefined);
   };
-  const subscriptions = params.subscriptions({
+
+  const subscriptions = storeConfig.subscriptions ? storeConfig.subscriptions({
     current() {
       return value.current();
     },
@@ -88,24 +134,25 @@ export const createStore = <StateType>(params: createStoreProps<StateType>): cre
       optimisticValues.update(deepSet({
         path: key,
         src: optimisticValues.current(),
-        replacement: value
+        value: value
       }));
       mutations[mutation.current().name](mutation.current().payload);
     },
     rollback() {
       value.update(snapshot.current());
     },
-  });
-  const mutations = params.mutations({
+  }) : undefined;
+
+  const mutations = storeConfig.mutations({
     current(){
       return value.current();
     },
     merge(newState) {
       dispatch(() => {
-        value.update(deepMerge({
-          oldObj: value.current(),
-          newObj: newState
-        }));
+          value.update(deepMerge({
+            src: value.current(),
+            dest: newState
+          }));
       });
     },
     set(props) {
@@ -113,13 +160,13 @@ export const createStore = <StateType>(params: createStoreProps<StateType>): cre
         value.update(deepSet({
           path: props.path,
           src: value.current(),
-          replacement: props.value,
+          value: props.value,
         }));
       });
     },
     reset() {
       dispatch(() => {
-        value.update(params.initialState);
+        value.update(storeConfig.initialState);
       });
     },
     optimistic(key, value) {
@@ -154,7 +201,16 @@ export const createStore = <StateType>(params: createStoreProps<StateType>): cre
   };
 };
 
-export const createStoreHook = <StateType, SelectionType = StateType>(params: createStoreHookProps<StateType>): createStoreHookReturn<StateType, SelectionType> => {
-  const store = createStore(params);
+/**
+ * Generates a new store hook for accessing the declared store's state and mutations.
+ * @template StateType The type of the state managed by the store.
+ * @template SelectionType Optional selector type, useful to represent the type of the selected subpart of the state.
+ * @param {createStoreHookProps<StateType>} storeConfig The configuration object used to create the store hook.
+ * @returns {createStoreHookReturn<StateType, SelectionType>} The generated React hook.
+ */
+export const createStoreHook = <StateType, SelectionType = StateType>(
+  storeConfig: createStoreHookProps<StateType>
+): createStoreHookReturn<StateType, SelectionType> => {
+  const store = createStore(storeConfig);
   return (selector) => useStore(store, selector);
 };

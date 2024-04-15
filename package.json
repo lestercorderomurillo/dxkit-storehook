@@ -1,6 +1,6 @@
 {
   "name": "zen-state",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Observable global state management library for React. Made with minimal declarative API.",
   "license": "MIT",
   "main": "index.ts",

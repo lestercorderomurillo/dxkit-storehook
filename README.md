@@ -23,13 +23,11 @@ yarn add zen-state
 
 ## Usage
 
-To begin, invoke the `createStoreHook` function to generate a new Hook. This fresh hook will be accessible universally, containing an array with your store state and an object with mutations. Integration with your ORM system, as well as fetch/submit operations, will be straightforward.
+To begin, call the `createStoreHook` function to generate a new Hook. Integration with your ORM system, as well as fetch/submit operations, will be straightforward with the subscriptions model to allow for easy optimistic updates by default.
 
 ```jsx
+import { db } from './db';
 import { createStore } from 'zen-state';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 type Book = {
   id: number;
@@ -39,20 +37,22 @@ type Book = {
 
 export const useBookStore = createStoreHook<Book[]>({
   initialState: [
-    { id: 1000, author: 'Lester', title: 'TestBook' }
+    { 
+      id: '3bd7ab65-fd3c-4c8e-af7e-0bf7541d2931', 
+      title: '1984' 
+      author: 'George Orwell', 
+    }
   ],
   mutations: ({ current, set, optimistic }) => ({
-    addBook: ({ book }) => set({ value: [...current(), { ...book, id: optimistic('id', 9999) }] }),
+    addBook: (book: Book) => set({ value: [...current(), { ...book, id: optimistic('id', undefined) }] }),
   }),
   subscriptions: ({ forward, rollback }) => ({
     addBook: {
       willCommit: async (book: Book) => {
         try {
-          const res = await prisma.book.create({
-            data: {
-              title: book.title,
-              author: book.author
-            }
+          const res = await db.books.insert({
+            title: book.title,
+            author: book.author
           });
           forward('id', res.id);
         } catch (error) {
@@ -67,7 +67,7 @@ export const useBookStore = createStoreHook<Book[]>({
   }),
 });
 ```
-Then use the created hook in your components to access and call the mutations defined on your store.
+This hook will be accessible universally, containing an array with your store state and an object with mutations to said store. 
 
 ```jsx
 import React from 'react';
