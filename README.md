@@ -44,7 +44,8 @@ export const useBookStore = createStoreHook<Book[]>({
     }
   ],
   mutations: ({ current, set, optimistic }) => ({
-    addBook: (book: Book) => set({ value: [...current(), { ...book, id: optimistic('id', undefined) }] }),
+    addBook: (book: Book) => 
+      set({ value: [...current(), { ...book, id: optimistic('id', 'temp-id') }] }),
   }),
   subscriptions: ({ forward, rollback }) => ({
     addBook: {

@@ -143,7 +143,7 @@ export const createStore = <StateType = any>(storeConfig: createStoreProps<State
     },
   }) : undefined;
 
-  const mutations = storeConfig.mutations({
+  const mutations = storeConfig.mutations ? storeConfig.mutations({
     current(){
       return value.current();
     },
@@ -175,13 +175,13 @@ export const createStore = <StateType = any>(storeConfig: createStoreProps<State
       }
       return value;
     },
-  });
+  }) : {};
 
   const mutationsProxy = new Proxy(mutations, {
     get(object: any, functionName: string) {
       const origMethod = object[functionName];
       if (typeof origMethod === 'function') {
-        return function (...args) {
+        return function (...args: any[]) {
           mutation.update({
             name: functionName,
             payload: args[0]
