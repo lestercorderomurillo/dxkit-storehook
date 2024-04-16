@@ -7,7 +7,6 @@ zen-state is an observable global state management library designed for React, a
 - **Seamless React Integration**: Easily integrates with React Components using hooks.
 - **High Performance**: Utilizes the modern signal-based architecture for efficiency.
 - **Type-Safe Documentation**: Ensures 100% type safety through comprehensive documentation.
-- **Low JS Bundle**: Less than 1KB footprint on your project bundle.
 
 
 ## Installation
