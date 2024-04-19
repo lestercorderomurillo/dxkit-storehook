@@ -127,7 +127,7 @@ export const createStore = <StateType = any>(storeConfig: createStoreProps<State
   };
 
   const subscriptions = storeConfig.subscriptions ? storeConfig.subscriptions({
-    current() {
+    get() {
       return value.current();
     },
     forward(key, value) {
@@ -144,16 +144,8 @@ export const createStore = <StateType = any>(storeConfig: createStoreProps<State
   }) : undefined;
 
   const mutations = storeConfig.mutations ? storeConfig.mutations({
-    current(){
+    get(){
       return value.current();
-    },
-    merge(newState) {
-      dispatch(() => {
-          value.update(deepMerge({
-            src: value.current(),
-            dest: newState
-          }));
-      });
     },
     set(props) {
       dispatch(() => {
@@ -164,9 +156,12 @@ export const createStore = <StateType = any>(storeConfig: createStoreProps<State
         }));
       });
     },
-    reset() {
+    merge(newState) {
       dispatch(() => {
-        value.update(storeConfig.initialState);
+          value.update(deepMerge({
+            src: value.current(),
+            dest: newState
+          }));
       });
     },
     optimistic(key, value) {
@@ -174,6 +169,11 @@ export const createStore = <StateType = any>(storeConfig: createStoreProps<State
         return optimisticValues[key];
       }
       return value;
+    },
+    reset() {
+      dispatch(() => {
+        value.update(storeConfig.initialState);
+      });
     },
   }) : {};
 

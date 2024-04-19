@@ -26,7 +26,7 @@ To begin, call the `createStoreHook` function to generate a new Hook. Integratio
 
 ```jsx
 import { db } from './db';
-import { createStore } from 'zen-state';
+import { createStoreHook } from 'zen-state';
 
 type Book = {
   id: number;
@@ -42,9 +42,9 @@ export const useBookStore = createStoreHook<Book[]>({
       author: 'George Orwell', 
     }
   ],
-  mutations: ({ current, set, optimistic }) => ({
+  mutations: ({ get, set, optimistic }) => ({
     addBook: (book: Book) => 
-      set({ value: [...current(), { ...book, id: optimistic('id', 'temp-id') }] }),
+      set({ value: [...get(), { ...book, id: optimistic('id', 'temp-id') }] }),
   }),
   subscriptions: ({ forward, rollback }) => ({
     addBook: {

@@ -64,11 +64,7 @@ export type MutationOperations<StateType> = {
      * Retrieves the current state of the store.
      * @returns {StateType} The current state of the store.
      */
-    current: () => StateType;
-    /**
-     * Resets the store's state to its initial value.
-     */
-    reset: () => void;
+    get: () => StateType;
     /**
      * Sets the store's state to the specified value.
      * @param {StoreSetMutationProps} setParams The parameters used to set the state.
@@ -86,6 +82,10 @@ export type MutationOperations<StateType> = {
      * @returns {any} The optimistic value, or the real value if its already forwarded.
      */
     optimistic: (key: string, value: any) => any;
+    /**
+     * Resets the store's state to its initial value.
+     */
+    reset: () => void;
 };
 
 /**
@@ -97,7 +97,7 @@ export type SubscriptionsOperations<StateType> = {
      * Retrieves the current state of the store.
      * @returns {StateType} The current state of the store.
      */
-    current: () => StateType;
+    get: () => StateType;
     /**
      * Forwards the real value with the specified key to replace the previous optimistic value.
      * @param {string} key The key to which to forward the value.
@@ -142,7 +142,15 @@ export type createStoreReturn<StateType> = Store<StateType>;
  */
 export type useStoreReturn<StateType = any, SelectionType = StateType> = [
     StateType | SelectionType,
-    { [functionName: string]: Function }
+    /**
+     * A dictionary object containing functions by their names.
+     */
+    { 
+        /**
+         * A function mapped by its name.
+         */
+        [functionName: string]: Function 
+    }
 ];
 
 /**
