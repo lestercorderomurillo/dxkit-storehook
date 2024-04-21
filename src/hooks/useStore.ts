@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { SelectorFunction, Store, useStoreReturn } from "../types";
 
 /**
- * Hhook for integrating a store.
+ * Hook for integrating a store.
  * @template StateType - The type of the state managed by the store.
  * @template SelectionType - The type of the selected state returned by the selector function.
  * @param store - The store instance to use.

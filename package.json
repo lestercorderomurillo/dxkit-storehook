@@ -33,7 +33,8 @@
   },
   "homepage": "https://github.com/lestercorderomurillo/zen-state#readme",
   "dependencies": {
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "type-fest": "^4.15.0"
   },
   "peerDependencies": {
     "react": "^18.2.0"

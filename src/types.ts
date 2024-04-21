@@ -1,7 +1,5 @@
-/**
- * Represents a function that can be called to unsubscribe from a subscription.
- */
-export type UnSubscribeFunction = any;
+import { createStoreHook } from "./functions";
+import type {Paths} from 'type-fest';
 
 /**
  * Represents a store that holds the application state.
@@ -18,42 +16,73 @@ export type Store<StateType = any> = {
      * @param {Function} callback A function to be called when the state changes.
      * @returns {UnSubscribeFunction} A function to unsubscribe from the subscription.
      */
-    subscribe: (callback: (state: StateType) => any) => UnSubscribeFunction;
+    subscribe: (callback: (state: StateType) => any) => Function;
     /**
-     * Defines the mutations that can be applied to the store's state.
+     * Contains the mutations that can be applied to the store's state.
      */
     mutations: Mutations;
 };
 
 /**
  * Represents a mapping of mutation names to mutation functions.
+ * @template StateType The type of the state managed by the store.
  */
 export type Mutations = {
-    [mutationName: string]: (payload?: any) => any;
+    [mutationName: string]: (payload?: any) => void;
+};
+
+
+/**
+ * Represents the return type of the useStore function.
+ * @template StateType The type of the state managed by the store.
+ * @template SelectionType The type of the selected state.
+ */
+export type useStoreReturn<StateType = any, SelectionType = StateType> = [
+    StateType | SelectionType,
+    {
+        [K in keyof Mutations]: Function;
+    }
+];
+
+/**
+ * Represents the properties used to create a store.
+ * @template StateType The type of the state managed by the store.
+ */
+export type createStoreProps<StateType = any> = {
+    /**
+     * The initial state of the store.
+     */
+    initialState: StateType | undefined;
+    /**
+     * A function that defines the mutations that can be applied to the store's state.
+     */
+    mutations?: (operations: MutationOperations<StateType>) => Mutations;
+    /**
+     * A function that defines the subscriptions for the mutations defined.
+     */
+    subscriptions?: (operations: SubscriptionsOperations<StateType>) => Subscriptions<StateType>;
 };
 
 /**
- * Represents the types of subscriptions for a store.
+ * Represents the return type of the createStore function.
+ * @template StateType The type of the state managed by the store.
  */
-export type Subscriptions<StateType> = {
-    [subscriptionName in keyof Store<StateType>['mutations']]?: SubscriptionsTypes;
-};
+export type createStoreReturn<StateType> = Store<StateType>;
 
 /**
- * Represents the types of subscriptions.
+ * Represents the properties used to create a store hook.
+ * @template StateType The type of the state managed by the store.
  */
-export type SubscriptionsTypes = {
-    willCommit?: (mutation: any) => Promise<any> | void;
-    didCommit?: (mutation: any) => Promise<any> | void;
-};
+export type createStoreHookProps<StateType = any> = createStoreProps<StateType>;
 
 /**
- * Represents the properties used to set the store's state.
- */
-export type StoreSetMutationProps = {
-    path?: string;
-    value: any;
-};
+* Represents the return type of the createStoreHook function.
+* @template StateType The type of the state managed by the store.
+* @template SelectionType The type of the selected state.
+*/
+export type createStoreHookReturn<StateType, SelectionType> = (
+   selector?: SelectorFunction<StateType, SelectionType>
+) => useStoreReturn<StateType, SelectionType>;
 
 /**
  * Represents the operations that can be performed on the store's state.
@@ -69,12 +98,12 @@ export type MutationOperations<StateType> = {
      * Sets the store's state to the specified value.
      * @param {StoreSetMutationProps} setParams The parameters used to set the state.
      */
-    set: (setParams: StoreSetMutationProps) => void;
+    set: (setParams: StoreSetMutationProps<StateType>) => void;
     /**
      * Merges the specified partial state into the store's state.
      * @param {Partial<StateType>} state The partial state to merge.
      */
-    merge: (state: Partial<StateType>) => void;
+    merge: (mergeParams: StoreMergeMutationProps<StateType>) => void;
     /**
      * Sets an optimistic value for a given key. When you call forward, this update will be computed again with the real value.
      * @param {string} key The key for which to remember this field.
@@ -86,6 +115,16 @@ export type MutationOperations<StateType> = {
      * Resets the store's state to its initial value.
      */
     reset: () => void;
+};
+
+/**
+ * Represents the types of subscriptions for a store.
+ */
+export type Subscriptions<StateType> = {
+    [subscriptionName in keyof Store<StateType>['mutations']]?: {
+        willCommit?: (mutation: any) => Function;
+        didCommit?: (mutation: any) => Function;
+    };
 };
 
 /**
@@ -111,62 +150,52 @@ export type SubscriptionsOperations<StateType> = {
 };
 
 /**
- * Represents the properties used to create a store.
+ * Represents the properties used to set the store's state.
  * @template StateType The type of the state managed by the store.
+ * @property {string|undefined} [path] The dot notation path to the property.
+ * @property {any} value The value to set.
  */
-export type createStoreProps<StateType = any> = {
-    /**
-     * The initial state of the store.
-     */
-    initialState: StateType | undefined;
-    /**
-     * A function that defines the mutations that can be applied to the store's state.
-     */
-    mutations?: (operations: MutationOperations<StateType>) => Mutations;
-    /**
-     * A function that defines the subscriptions for the store.
-     */
-    subscriptions?: (operations: SubscriptionsOperations<StateType>) => Subscriptions<StateType>;
+export type StoreSetMutationProps<StateType> = { 
+    path?: Paths<StateType>;
+    value: any;
 };
 
 /**
- * Represents the return type of the createStore function.
- * @template StateType The type of the state managed by the store.
+ * Represents the properties used to merge the store's state.
  */
-export type createStoreReturn<StateType> = Store<StateType>;
+export type StoreMergeMutationProps<StateType = any> = Partial<StateType>;
 
 /**
- * Represents the return type of the useStore function.
- * @template StateType The type of the state managed by the store.
- * @template SelectionType The type of the selected state.
+ * Represents an action dispatched to mutate application state.
+ * @property {string} name - The name of the action.
+ * @property {any} payload - Optional data associated with the action.
  */
-export type useStoreReturn<StateType = any, SelectionType = StateType> = [
-    StateType | SelectionType,
-    /**
-     * A dictionary object containing functions by their names.
-     */
-    { 
-        /**
-         * A function mapped by its name.
-         */
-        [functionName: string]: Function 
-    }
-];
+export type Action = {
+  name: string;
+  payload?: any;
+};
 
 /**
- * Represents the return type of the createStoreHook function.
- * @template StateType The type of the state managed by the store.
- * @template SelectionType The type of the selected state.
+ * Represents the parameters for a deep merge operation.
+ * @property {any} sourceObject - The source object to merge from.
+ * @property {any} targetObject - The target object to merge into.
  */
-export type createStoreHookReturn<StateType, SelectionType> = (
-    selector?: SelectorFunction
-) => useStoreReturn<StateType, SelectionType>;
-
+export type DeepMergeOptions = {
+    sourceObject: any;
+    targetObject: any;
+}
+  
 /**
- * Represents the properties used to create a store hook.
- * @template StateType The type of the state managed by the store.
+ * Represents the parameters for a deep set operation.
+ * @property {any} sourceObject - The source object to set from.
+ * @property {string} propertyPath The path to the property.
+ * @property {any} value - The value to set.
  */
-export type createStoreHookProps<StateType = any> = createStoreProps<StateType>;
+export type DeepSetOptions = {
+    sourceObject: any;
+    propertyPath: string;
+    value: any;
+}
 
 /**
  * Represents a function that selects a portion of the store's state.
@@ -176,35 +205,3 @@ export type createStoreHookProps<StateType = any> = createStoreProps<StateType>;
 export type SelectorFunction<StateType = any, SelectedType = any> = (
     state: StateType
 ) => SelectedType;
-
-/**
- * Represents the parameters for a deep merge operation.
- * @property {object} any - The source object to merge from.
- * @property {object} any - The target object to merge into.
- */
-export type DeepMergeOptions = {
-  src: any;
-  dest: any;
-}
-
-/**
- * Represents the parameters for a deep set operation.
- * @property {any} src - The source object to set from.
- * @property {string} path The path to the property.
- * @property {object} value - The value to set.
- */
-export type DeepSetOptions = {
-  src: any;
-  path: string;
-  value: any;
-}
-
-/**
- * Represents a mutation that has been dispatched.
- * @property {string} name - The name of the mutation.
- * @property {*} payload - The payload of the mutation (optional).
- */
-export type MutationDispatch = {
-  name: string;
-  payload?: any;
-};
