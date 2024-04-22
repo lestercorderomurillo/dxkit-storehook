@@ -1,6 +1,6 @@
 {
   "name": "zen-state",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Observable global state management library for React. Made with minimal declarative API.",
   "license": "MIT",
   "main": "index.ts",
@@ -21,7 +21,14 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "yarn prettier . --write"
+  },
+  "prettier": {
+    "printWidth": 125,
+    "plugins": [
+      "prettier-plugin-organize-imports"
+    ]
   },
   "repository": {
     "type": "git",
@@ -40,6 +47,9 @@
     "react": "^18.2.0"
   },
   "devDependencies": {
+    "@types/react": "^18.2.79",
+    "prettier": "3.2.5",
+    "prettier-plugin-organize-imports": "^3.2.4",
     "typescript": "^4.5.4"
   },
   "engines": {

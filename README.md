@@ -1,21 +1,26 @@
-# `zen-state`
-zen-state is an observable global state management library designed for React, aimed at minimizing boilerplate while maximizing developer experience.
+# `Zen State`
 
-## List of features
-- **Centralized State Management**: Provides a predictable global state reducer.
+Zen State is an observable global state management library designed for React.
+Aimed at minimizing boilerplate while maximizing developer experience.
+
+## Features
+
+- **Centralized State Management**: Provides a predictable global state reducer through mutations.
 - **Best Practiques by Default**: Encourages developers to easily write optimistic updates by default.
 - **Seamless React Integration**: Easily integrates with React Components using hooks.
 - **High Performance**: Utilizes the modern signal-based architecture for efficiency.
-- **Type-Safe Documentation**: Ensures 100% type safety through comprehensive documentation.
-
+- **Type-Safe Documentation**: Ensures 100% type autocompletion, to improve code experience.
 
 ## Installation
 
 - npm
+
 ```sh
 npm install zen-state
 ```
+
 - Yarn
+
 ```sh
 yarn add zen-state
 ```
@@ -25,67 +30,73 @@ yarn add zen-state
 To begin, call the `createStoreHook` function to generate a new Hook. Integration with your ORM system, as well as fetch/submit operations, will be straightforward with the subscriptions model to allow for easy optimistic updates by default.
 
 ```jsx
-import { db } from './db';
-import { createStoreHook } from 'zen-state';
-
-type Book = {
+type Friend = {
   id: number;
-  title: string;
-  author: string;
-};
+  firstName: string;
+  lastName: string;
+  status: "Online" | "Offline" | "Away";
+}
 
-export const useBookStore = createStoreHook<Book[]>({
-  initialState: [
-    { 
-      id: '3bd7ab65-fd3c-4c8e-af7e-0bf7541d2931', 
-      title: '1984' 
-      author: 'George Orwell', 
-    }
-  ],
-  mutations: ({ get, set, optimistic }) => ({
-    addBook: (book: Book) => 
-      set({ value: [...get(), { ...book, id: optimistic('id', 'temp-id') }] }),
-  }),
-  subscriptions: ({ forward, rollback }) => ({
-    addBook: {
-      willCommit: async (book: Book) => {
-        try {
-          const res = await db.books.insert({
-            title: book.title,
-            author: book.author
-          });
-          forward('id', res.id);
-        } catch (error) {
-          console.error('Error inserting book:', error);
-          rollback();
-        }
-      },
-      didCommit: (book: Book) => {
-        console.log(`Book with id ${book.id} was inserted.`);
-      },
+export const useFriends = createStoreHook({
+  initialState: {
+    friends: [
+      { id: 1, firstName: "Alice", lastName: "Johnson", status: "Online" },
+      { id: 2, firstName: "Bob", lastName: "Smith", status: "Offline" },
+      { id: 3, firstName: "Charlie", lastName: "Brown", status: "Away" },
+      { id: 4, firstName: "Diana", lastName: "Garcia", status: "Online" },
+      { id: 5, firstName: "Emily", lastName: "Davis", status: "Offline" },
+      { id: 6, firstName: "Frank", lastName: "Martinez", status: "Online" },
+      { id: 7, firstName: "Grace", lastName: "Anderson", status: "Online" },
+      { id: 8, firstName: "Henry", lastName: "Thompson", status: "Away" },
+    ],
+  },
+  mutations: ({ get, set, merge }) => ({
+    addFriend: (friend: Friend) => {
+      const friends = get().friends;
+      set({ path: "friends", value: [...friends, friend] });
     },
-  }),
+    removeFriend: ({ friendId }: { friendId: number }) => {
+      const friends = get().friends.filter((friend) => friend.id !== friendId);
+      set({ path: "friends", value: friends });
+    },
+    updateStatus: ({ friendId, newStatus }: { friendId: number; newStatus: Friend["status"] }) => {
+      const friends = get().friends.map((friend) => (friend.id === friendId ? { ...friend, status: newStatus } : friend));
+      set({ path: "friends", value: friends });
+    },
+  })
 });
 ```
-This hook will be accessible universally, containing an array with your store state and an object with mutations to said store. 
+
+This hook will be accessible globally, containing an array with your store state and an object with mutations to said store.
 
 ```jsx
-import React from 'react';
-import { useBookStore } from './useBookStore';
+import React from "react";
+import { useFriends } from "./useFriends";
 
 function Component() {
-  const [bookStore, { addBook }] = useBookStore();
+  const [{ friends }, { addFriend }] = useFriends();
 
   return (
     <div>
-      <h2>Books</h2>
+      <h2>Friends</h2>
       <ul>
-        {bookStore.books.map(book => (
-          <li key={book.id}>{book.title} by {book.author}</li>
+        {friends.map((friend) => (
+          <li key={friend.id}>
+            {friend.firstName} {friend.lastName} - {friend.status}
+          </li>
         ))}
       </ul>
-      <button onClick={() => addBook({ title: "New Book", author: "New Author", genre: "New Genre" })}>
-        Add Book
+      <button
+        onClick={() =>
+          addFriend({
+            id: 9,
+            firstName: "New",
+            lastName: "Friend",
+            status: "Online",
+          })
+        }
+      >
+        Add Friend
       </button>
     </div>
   );

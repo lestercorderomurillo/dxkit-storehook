@@ -1,207 +1,219 @@
-import { createStoreHook } from "./functions";
-import type {Paths} from 'type-fest';
+import { Paths } from "type-fest";
 
 /**
- * Represents a store that holds the application state.
- * @template StateType The type of the state managed by the store.
+ * Represents the schema for a store that holds the application state.
+ * @template TState The type of the state managed by the store.
+ * @template TMutations The type of mutations that can be dispatched to the store.
+ * @template TSubscriptions The type of subscriptions that can be attached to mutations.
  */
-export type Store<StateType = any> = {
-    /**
-     * Retrieves the current state of the store.
-     * @returns {StateType | undefined} The current state of the store.
-     */
-    current: () => StateType | undefined;
-    /**
-     * Subscribes to changes in the store's state.
-     * @param {Function} callback A function to be called when the state changes.
-     * @returns {UnSubscribeFunction} A function to unsubscribe from the subscription.
-     */
-    subscribe: (callback: (state: StateType) => any) => Function;
-    /**
-     * Contains the mutations that can be applied to the store's state.
-     */
-    mutations: Mutations;
+export type StoreSchema<
+  TState = any,
+  TMutations extends MutationsSchema = MutationsSchema,
+  TSubscriptions extends SubscriptionsSchema<TMutations> = SubscriptionsSchema<TMutations>,
+> = {
+  /**
+   * The initial state of the store.
+   */
+  initialState: TState | undefined;
+  /**
+   * A function that holds the defined mutation functions.
+   * @param operations Callbacks available that can perform mutations on the store.
+   * @returns An object containing the store mutation functions.
+   */
+  mutations?: (operations: MutationOperations<TState>) => TMutations;
+  /**
+   * A function that generates subscription functions based on the provided mutations.
+   * @param operations The subscription operations available in the store.
+   * @returns An object containing the store subscription functions.
+   */
+  subscriptions?: (operations: SubscriptionOperations<TState>) => TSubscriptions;
 };
 
 /**
- * Represents a mapping of mutation names to mutation functions.
- * @template StateType The type of the state managed by the store.
+ * Represents a store that holds a state consistently.
+ * @template StateType - The type of the state managed by the store.
+ * @template TMutations - The type of mutations that can be dispatched to the store.
  */
-export type Mutations = {
-    [mutationName: string]: (payload?: any) => void;
-};
-
-
-/**
- * Represents the return type of the useStore function.
- * @template StateType The type of the state managed by the store.
- * @template SelectionType The type of the selected state.
- */
-export type useStoreReturn<StateType = any, SelectionType = StateType> = [
-    StateType | SelectionType,
-    {
-        [K in keyof Mutations]: Function;
-    }
-];
-
-/**
- * Represents the properties used to create a store.
- * @template StateType The type of the state managed by the store.
- */
-export type createStoreProps<StateType = any> = {
-    /**
-     * The initial state of the store.
-     */
-    initialState: StateType | undefined;
-    /**
-     * A function that defines the mutations that can be applied to the store's state.
-     */
-    mutations?: (operations: MutationOperations<StateType>) => Mutations;
-    /**
-     * A function that defines the subscriptions for the mutations defined.
-     */
-    subscriptions?: (operations: SubscriptionsOperations<StateType>) => Subscriptions<StateType>;
+export type Store<TState = any, TMutations extends MutationsSchema = {}> = {
+  /**
+   * Retrieves the current root state of the store.
+   * @returns {TState | undefined} The current state of the store.
+   */
+  current: () => TState | undefined;
+  /**
+   * Subscribes to changes in the store's state.
+   * @param {Function} callback - A function to be called when the state changes. The function receives the new state as its argument.
+   * @returns {Function} A function to unsubscribe from the subscription.
+   */
+  subscribe: (callback: (state: TState) => any) => () => void;
+  /**
+   * Mutations callbacks that can be dispatched to the store.
+   */
+  mutations: TMutations;
 };
 
 /**
- * Represents the return type of the createStore function.
- * @template StateType The type of the state managed by the store.
+ * Enforces mutations schemas to be defined in a specific way.
+ * @typedef {Object} MutationsSchema
+ * @property {Function} [key: string] - A mutation function that takes an optional payload as an argument and returns void.
+ * @property {any} [payload=] - The optional payload to be passed to the mutation function.
  */
-export type createStoreReturn<StateType> = Store<StateType>;
-
-/**
- * Represents the properties used to create a store hook.
- * @template StateType The type of the state managed by the store.
- */
-export type createStoreHookProps<StateType = any> = createStoreProps<StateType>;
-
-/**
-* Represents the return type of the createStoreHook function.
-* @template StateType The type of the state managed by the store.
-* @template SelectionType The type of the selected state.
-*/
-export type createStoreHookReturn<StateType, SelectionType> = (
-   selector?: SelectorFunction<StateType, SelectionType>
-) => useStoreReturn<StateType, SelectionType>;
-
-/**
- * Represents the operations that can be performed on the store's state.
- * @template StateType The type of the state managed by the store.
- */
-export type MutationOperations<StateType> = {
-    /**
-     * Retrieves the current state of the store.
-     * @returns {StateType} The current state of the store.
-     */
-    get: () => StateType;
-    /**
-     * Sets the store's state to the specified value.
-     * @param {StoreSetMutationProps} setParams The parameters used to set the state.
-     */
-    set: (setParams: StoreSetMutationProps<StateType>) => void;
-    /**
-     * Merges the specified partial state into the store's state.
-     * @param {Partial<StateType>} state The partial state to merge.
-     */
-    merge: (mergeParams: StoreMergeMutationProps<StateType>) => void;
-    /**
-     * Sets an optimistic value for a given key. When you call forward, this update will be computed again with the real value.
-     * @param {string} key The key for which to remember this field.
-     * @param {any} value The optimistic value to pass before the real value is forwarded.
-     * @returns {any} The optimistic value, or the real value if its already forwarded.
-     */
-    optimistic: (key: string, value: any) => any;
-    /**
-     * Resets the store's state to its initial value.
-     */
-    reset: () => void;
+export type MutationsSchema = {
+  [key: string]: (payload?: any) => void;
 };
 
 /**
- * Represents the types of subscriptions for a store.
+ * Enforces subscription schemas to be defined in a specific way.
+ * @template TMutations - The type of mutations to which subscriptions can be attached.
  */
-export type Subscriptions<StateType> = {
-    [subscriptionName in keyof Store<StateType>['mutations']]?: {
-        willCommit?: (mutation: any) => Function;
-        didCommit?: (mutation: any) => Function;
-    };
+export type SubscriptionsSchema<TMutations extends MutationsSchema> = {
+  [key in keyof TMutations]?: {
+    /**
+     * A hook function that is called before the current mutation is permanently committed.
+     * It receives the same arguments as the mutation function the user called.
+     *
+     * Intended to be used as a submission point and to forward the real values from your external datasource
+     * into the optimistic values that have already been mutated.
+     */
+    willCommit?: (...args: Parameters<TMutations[key]>) => void;
+    /**
+     * A hook function that is called after the corresponding mutation is fully committed,
+     * and already using the final values from your external datasource.
+     * It receives the same arguments as the mutation function.
+     */
+    didCommit?: (...args: Parameters<TMutations[key]>) => void;
+  };
+};
+
+export type useStoreReturn<TState, TSlice, TMutations> = [TState | TSlice, TMutations];
+
+/**
+ * Represents the operations available for mutations.
+ * @template TState The type of the state managed by the store.
+ */
+export type MutationOperations<TState> = {
+  /**
+   * Retrieves the current state of the store.
+   * @returns The current state.
+   */
+  get: () => TState;
+  /**
+   * Sets the state of the store.
+   * @param setParams The parameters for setting the state.
+   */
+  set: (setParams: SetMutation<TState>) => void;
+  /**
+   * Merges new data into the state of the store.
+   * @param mergeParams The parameters for merging the state.
+   */
+  merge: (mergeParams: MergeMutation<TState>) => void;
+  /**
+   * Provides optimistic updates to the state.
+   * @param key The key of the value to update.
+   * @param value The optimistic value.
+   * @returns The updated value.
+   */
+  optimistic: (key: string, value: any) => any;
+  /**
+   * Resets the state of the store.
+   */
+  reset: () => void;
 };
 
 /**
- * Represents the operations that can be performed on store subscriptions.
- * @template StateType The type of the state managed by the store.
+ * Represents the operations available for subscriptions.
+ * @template TState The type of the state managed by the store.
  */
-export type SubscriptionsOperations<StateType> = {
-    /**
-     * Retrieves the current state of the store.
-     * @returns {StateType} The current state of the store.
-     */
-    get: () => StateType;
-    /**
-     * Forwards the real value with the specified key to replace the previous optimistic value.
-     * @param {string} key The key to which to forward the value.
-     * @param {ForwardedType} value The real value to forward.
-     */
-    forward: <ForwardedType = any>(key: string, value: ForwardedType) => void;
-    /**
-     * Rollback the mutation. The state will be set back to before it was executed.
-     */
-    rollback: () => void;
+export type SubscriptionOperations<TState> = {
+  /**
+   * Retrieves the current state of the store.
+   * @returns {TState} The current state.
+   */
+  get: () => TState;
+  /**
+   * Forwards a value to a previous cache and forces a store update.
+   * @param key The key to replace from a previous optimistic value.
+   * @param value The non-optimistic value.
+   */
+  forward: (key: string, value: any) => void;
+  /**
+   * Rolls back the mutation and stop propagation to other mutation subscriptions.
+   */
+  rollback: () => void;
 };
 
 /**
- * Represents the properties used to set the store's state.
- * @template StateType The type of the state managed by the store.
- * @property {string|undefined} [path] The dot notation path to the property.
- * @property {any} value The value to set.
- */
-export type StoreSetMutationProps<StateType> = { 
-    path?: Paths<StateType>;
-    value: any;
-};
+ * Represents a function that selects a portion of the store's state.
+ * @template TState - The type of the state managed by the store.
+ * @template TSlice - The type of the selected state.
+ * @param {TState} state - The current state of the store.
+ * @returns {TSlice} The selected portion of the store's state.
+ **/
+export type Selector<TState = any, TSlice = any> = (state: TState) => TSlice;
 
 /**
- * Represents the properties used to merge the store's state.
- */
-export type StoreMergeMutationProps<StateType = any> = Partial<StateType>;
-
-/**
- * Represents an action dispatched to mutate application state.
- * @property {string} name - The name of the action.
- * @property {any} payload - Optional data associated with the action.
+ * Represents an action or mutation that can be dispatched to the store.
  */
 export type Action = {
+  /**
+   * The name of the action.
+   */
   name: string;
+  /**
+   * The payload associated with the action.
+   */
   payload?: any;
 };
 
 /**
- * Represents the parameters for a deep merge operation.
- * @property {any} sourceObject - The source object to merge from.
- * @property {any} targetObject - The target object to merge into.
+ * Represents parameters for deeply setting a value in an object.
  */
-export type DeepMergeOptions = {
-    sourceObject: any;
-    targetObject: any;
-}
-  
-/**
- * Represents the parameters for a deep set operation.
- * @property {any} sourceObject - The source object to set from.
- * @property {string} propertyPath The path to the property.
- * @property {any} value - The value to set.
- */
-export type DeepSetOptions = {
-    sourceObject: any;
-    propertyPath: string;
-    value: any;
-}
+export type DeepSet = {
+  /**
+   * The source object.
+   */
+  sourceObject: any;
+  /**
+   * The property path where the value should be set.
+   */
+  propertyPath: string;
+  /**
+   * The value to set.
+   */
+  value: any;
+};
 
 /**
- * Represents a function that selects a portion of the store's state.
- * @template StateType The type of the state managed by the store.
- * @template SelectedType The type of the selected state.
+ * Represents parameters for deeply merging objects.
  */
-export type SelectorFunction<StateType = any, SelectedType = any> = (
-    state: StateType
-) => SelectedType;
+export type DeepMerge = {
+  /**
+   * The source object.
+   */
+  sourceObject: any;
+  /**
+   * The target object.
+   */
+  targetObject: any;
+};
+
+/**
+ * Represents parameters for setting the state of the store.
+ * @template TState The type of the state managed by the store.
+ */
+export type SetMutation<TState> = {
+  /**
+   * The path to where the value should be set in the state.
+   */
+  path?: Paths<TState>;
+  /**
+   * The value to set.
+   */
+  value: any;
+};
+
+/**
+ * Represents parameters for merging data into the state of the store.
+ * @template TState The type of the state managed by the store.
+ */
+export type MergeMutation<TState = any> = Partial<TState>;

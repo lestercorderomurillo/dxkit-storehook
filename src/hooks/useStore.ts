@@ -1,30 +1,28 @@
 import { useEffect, useState } from "react";
-import { SelectorFunction, Store, useStoreReturn } from "../types";
+import { MutationsSchema, Selector, Store, useStoreReturn } from "../types";
 
 /**
- * Hook for integrating a store.
- * @template StateType - The type of the state managed by the store.
- * @template SelectionType - The type of the selected state returned by the selector function.
- * @param store - The store instance to use.
- * @param selector - An selector function to extract a selected portion of the state.
- * @returns An array containing the selected state and store mutations.
+ * Hook for interacting with a store.
+ * @template TState The type of the state managed by the store.
+ * @template TSlice The type of the selected state.
+ * @template TMutations The type of mutations that can be dispatched to the store.
+ * @param {Store<TState, TMutations>} store The store to interact with.
+ * @param {Selector<TState, TSlice>} [selector] A function to select a portion of the store's state.
+ * @returns {useStoreReturn<TState, TSlice, TMutations>} An array containing the selected state and mutation functions.
  */
-export const useStore = <StateType = any, SelectionType = StateType>(
-  store: Store<StateType>,
-  selector?: SelectorFunction<StateType, SelectionType>
-): useStoreReturn<StateType, SelectionType> => {
-  // If no selector is provided, default to identity function
-  const defaultSelector = (state: StateType): StateType | SelectionType => state;
+export const useStore = <TState, TSlice = TState, TMutations extends MutationsSchema = MutationsSchema>(
+  store: Store<TState, TMutations>,
+  selector?: Selector<TState, TSlice>,
+): useStoreReturn<TState, TSlice, TMutations> => {
+  const defaultSelector = (state: TState): TState | TSlice => state;
   const select = selector ? selector : defaultSelector;
-  const [selection, setSelection] = useState<StateType | SelectionType>(select(store.current()));
+  const [selection, setSelection] = useState(select(store.current()));
 
   useEffect(() => {
-    return store.subscribe((newState: StateType) => {
-      // Deep clone the selected state to avoid reference issues
+    return store.subscribe((newState: TState) => {
       setSelection(JSON.parse(JSON.stringify(select(newState))));
     });
   }, []);
 
-  // Return the selected state and store mutations
   return [selection, store.mutations];
 };

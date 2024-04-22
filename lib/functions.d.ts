@@ -1,53 +1,18 @@
-import { createStoreProps, createStoreReturn, createStoreHookReturn, createStoreHookProps, DeepMergeOptions, DeepSetOptions } from "./types";
+import { MutationsSchema, Selector, Store, StoreSchema, SubscriptionsSchema } from "./types";
 /**
- * Checks if the given value is a function.
- * @param {any} value The value to check.
- * @returns {boolean} True if the value is a function, otherwise false.
+ * Creates a store based on the provided schema.
+ * @template TState The type of the state managed by the store.
+ * @template TMutations The type of mutations that can be dispatched to the store.
+ * @template TSubscriptions The type of subscriptions that can be attached to mutations.
+ * @param {StoreSchema<TState, TMutations, TSubscriptions>} schema The schema defining the structure of the store.
+ * @returns {Store<TState, TMutations>} A store object with specified state, mutations, and subscriptions.
  */
-export declare const isFunction: (value: any) => value is Function;
+export declare const createStore: <TState = any, TMutations extends MutationsSchema = MutationsSchema, TSubscriptions extends SubscriptionsSchema<TMutations> = SubscriptionsSchema<TMutations>>(schema: StoreSchema<TState, TMutations, TSubscriptions>) => Store<TState, TMutations>;
 /**
- * Checks if the given value is an object.
- * @param {any} value The value to check.
- * @returns {boolean} True if the value is an object, otherwise false.
+ * Generates a hook for interacting with a store based on the provided initial state schema.
+ * @template TState The type of the state managed by the store.
+ * @template TMutations The type of mutations that can be dispatched to the store.
+ * @template TSubscriptions The type of subscriptions that can be attached to mutations.
+ * @param {StoreSchema<TState, TMutations, TSubscriptions>} schema The schema defining the initial state of the store.
  */
-export declare const isObject: (value: any) => value is object;
-/**
- * Checks if the given value is a string.
- * @param {any} value The value to check.
- * @returns {boolean} True if the value is a string, otherwise false.
- */
-export declare const isString: (value: any) => value is string;
-/**
- * Checks if the given object is valid JSON.
- * @param {any} value The object to check.
- * @returns {boolean} True if the object is valid JSON, otherwise false.
- */
-export declare const isJSON: (value: any) => boolean;
-/**
- * Merges two objects deeply.
- * @param {DeepMergeOptions} options - The options for the merge operation.
- * @returns {any} The merged object.
- */
-export declare const deepMerge: ({ src, dest }: DeepMergeOptions) => any;
-/**
- * Sets a deeply nested property in an object.
- * @param {object} src The source object.
- * @param {any} value The value to set.
- * @returns {any} The modified object.
- */
-export declare const deepSet: ({ path, src, value }: DeepSetOptions) => any;
-/**
- * Creates a new store instance with the specified initial state.
- * @template StateType - The type of the state managed by the store.
- * @param {createStoreProps<StateType>} storeConfig Configuration object for creating the store.
- * @returns {createStoreReturn<StateType>} An object containing the store instance.
- */
-export declare const createStore: <StateType = any>(storeConfig: createStoreProps<StateType>) => createStoreReturn<StateType>;
-/**
- * Generates a new store hook for accessing the declared store's state and mutations.
- * @template StateType The type of the state managed by the store.
- * @template SelectionType Optional selector type, useful to represent the type of the selected subpart of the state.
- * @param {createStoreHookProps<StateType>} storeConfig The configuration object used to create the store hook.
- * @returns {createStoreHookReturn<StateType, SelectionType>} The generated React hook.
- */
-export declare const createStoreHook: <StateType, SelectionType = StateType>(storeConfig: createStoreHookProps<StateType>) => createStoreHookReturn<StateType, SelectionType>;
+export declare const createStoreHook: <TState = any, TMutations extends MutationsSchema = MutationsSchema, TSubscriptions extends SubscriptionsSchema<TMutations> = SubscriptionsSchema<TMutations>>(schema: StoreSchema<TState, TMutations, TSubscriptions>) => <TSlice = TState>(selector?: Selector<TState, TSlice>) => import("./types").useStoreReturn<TState, TSlice, TMutations>;
