@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { MutationsSchema, Selector, Store, useStoreReturn } from "../types";
+import { isObject } from "../utils";
 
 /**
  * Hook for interacting with a store.
@@ -20,7 +21,13 @@ export const useStore = <TState, TSlice = TState, TMutations extends MutationsSc
 
   useEffect(() => {
     return store.subscribe((newState: TState) => {
-      setSelection(JSON.parse(JSON.stringify(select(newState))));
+      if (isObject(newState)) {
+        setSelection(select({ ...newState }));
+      } else if (Array.isArray(newState)) {
+        setSelection(select([...newState] as any));
+      } else {
+        setSelection(select(newState));
+      }
     });
   }, []);
 

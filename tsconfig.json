@@ -3,7 +3,7 @@
     "jsx": "react",
     "module": "commonjs",
     "esModuleInterop": true,
-    "target": "es2020",
+    "target": "es2021",
     "declaration": true,
     "outDir": "./lib"
   },
