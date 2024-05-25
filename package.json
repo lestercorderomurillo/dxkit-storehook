@@ -31,13 +31,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lestercorderomurillo/zen-state.git"
+    "url": "git+https://github.com/lestercorderomurillo/xspectrum-state.git"
   },
   "author": "Lester Cordero Murillo",
   "bugs": {
-    "url": "https://github.com/lestercorderomurillo/zen-state/issues"
+    "url": "https://github.com/lestercorderomurillo/xspectrum-state/issues"
   },
-  "homepage": "https://github.com/lestercorderomurillo/zen-state#readme",
+  "homepage": "https://github.com/lestercorderomurillo/xspectrum-state#readme",
   "dependencies": {
     "react": "^18.2.0",
     "type-fest": "^4.18.2"
