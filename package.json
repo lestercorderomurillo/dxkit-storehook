@@ -21,7 +21,9 @@
     "lib": "lib"
   },
   "scripts": {
-    "format": "yarn prettier . --write"
+    "build": "tsc",
+    "format": "yarn prettier . --write",
+    "reset": "git reset --hard origin/main"
   },
   "prettier": {
     "printWidth": 125,
