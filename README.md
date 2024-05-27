@@ -2,7 +2,7 @@
   <img src="logo.png" alt="logo" width="240">
 </p>
 
-***xpertjs-state*** is a global state management library for modern React applications.
+**_xpertjs-state_** is a global state management library for modern React applications.
 
 The goal of this project is to provide a simple yet scalable solution for creating complex nested states that align with modern React architectures, while ensuring a smooth developer experience.
 
@@ -53,25 +53,25 @@ type RemoveBookParams = Pick<Book, 'id'>;
 export const useBooks = createStoreHook({
   initialState: {
     books: [
-      { 
-        id: '1fe8d8aa-ac7d-4bd3-b123-5ca0bea9fac4', 
-        title: "War and Peace", 
-        author: "Leo Tolstoy", 
-        genre: "Historical Fiction", 
-        publicationYear: 1869 
+      {
+        id: '1fe8d8aa-ac7d-4bd3-b123-5ca0bea9fac4',
+        title: "War and Peace",
+        author: "Leo Tolstoy",
+        genre: "Historical Fiction",
+        publicationYear: 1869
       },
-      { 
-        id: '04b2014f-3d6d-46a9-b5a4-c9345d6e3406', 
+      {
+        id: '04b2014f-3d6d-46a9-b5a4-c9345d6e3406',
         title: "Crime and Punishment",
-        author: "Fyodor Dostoevsky", 
-        genre: "Psychological Fiction", 
-        publicationYear: 1866 
+        author: "Fyodor Dostoevsky",
+        genre: "Psychological Fiction",
+        publicationYear: 1866
       },
-      { 
-        id: '46335384-9fab-41c9-abc0-b1b80e12fab6', 
-        title: "1984", 
-        author: "George Orwell", 
-        genre: "Dystopian Fiction", 
+      {
+        id: '46335384-9fab-41c9-abc0-b1b80e12fab6',
+        title: "1984",
+        author: "George Orwell",
+        genre: "Dystopian Fiction",
         publicationYear: 1949
       },
     ],
@@ -128,9 +128,7 @@ function Component() {
     </div>
   );
 }
-
 ```
 
-This component demonstrates how to use the useBooks hook to manage a list of books. 
+This component demonstrates how to use the useBooks hook to manage a list of books.
 The addBook and removeBook functions update the global state, and the changes are reflected in the UI.
-

@@ -45,7 +45,7 @@ const transaction = async (fn: Function, { snapshot, value, mutation, subscripti
   }
   let subscription = undefined;
 
-  if(subscriptions){
+  if (subscriptions) {
     subscription = subscriptions[mutation.current().name];
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "xpertjs-state",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Global state management library for Modern React applications.",
   "license": "MIT",
   "main": "index.ts",
