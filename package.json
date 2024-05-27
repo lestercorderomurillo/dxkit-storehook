@@ -23,7 +23,8 @@
   "scripts": {
     "build": "tsc",
     "format": "yarn prettier . --write",
-    "reset": "git reset --hard origin/main"
+    "reset": "git reset --hard origin/main",
+    "release": "yarn format && bash ./release.sh"
   },
   "prettier": {
     "printWidth": 125,
