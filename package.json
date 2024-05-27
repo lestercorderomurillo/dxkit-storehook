@@ -1,6 +1,6 @@
 {
   "name": "xpertjs-state",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Global state management library for Modern React applications.",
   "license": "MIT",
   "main": "index.ts",
@@ -42,14 +42,11 @@
   },
   "homepage": "https://github.com/lestercorderomurillo/xpertjs-state#readme",
   "dependencies": {
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "type-fest": "^4.18.2"
   },
-  "peerDependencies": {
-    "react": "^18.2.0"
-  },
+  "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "^18.2.79",
     "prettier": "3.2.5",
     "prettier-plugin-organize-imports": "^3.2.4",
     "typescript": "^4.5.4"

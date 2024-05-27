@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="logo" width="200">
+  <img src="logo.png" alt="logo" width="240">
 </p>
 
 ***xpertjs-state*** is a global state management library for modern React applications.
