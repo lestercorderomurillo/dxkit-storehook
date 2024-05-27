@@ -1,43 +1,46 @@
-<img src="xspectrum.png" alt="xspectrum" width="300"/>
+<p align="center">
+  <img src="logo.png" alt="logo" width="200">
+</p>
 
-xspectrum-state is an global state management for Modern React
+***xpertjs-state*** is a global state management library for modern React applications.
 
-The goal is of this project is to provide a simple to use, yet scalable solution for creating complex nested states that hold to modern React architectures, while ensuring the developer experience stays sane.
+The goal of this project is to provide a simple yet scalable solution for creating complex nested states that align with modern React architectures, while ensuring a smooth developer experience.
 
 ## Key features
 
-- **Optimistic Updates**: Encourages developers to easily write optimistic updates by default.
-- **High performance**: Utilizes the modern signal-based architecture for efficiency delivering fast updates to components.
-- **Centralized state**: Provides a predictable global state through mutations and subscriptions.
-- **Seamless integration**: Easily integrates using hooks.
-- **Type-Safe documentation**: Type autocompletion and simple API.
+- **Optimistic Updates**: Encourages developers to write optimistic updates by default.
+- **High performance**: Utilizes a signal-based architecture for efficient, fast updates to components.
+- **Centralized state**: Provides a predictable global state through mutations and subscriptions based on a minimal API.
+- **Seamless integration**: Easily integrates to components using hooks.
+- **Type-Safe documentation**: Offers type autocompletion and comprehensive documentation.
 
 ## Installation
 
-To install this library, you can run this command.
+To install this library, you can use either Yarn or npm. We highly recommend using Yarn.
 
-We highly recommend using yarn.
-
-
-```sh
-yarn add xspectrum-state
-```
-
-But you can still still though npm.
+Using Yarn:
 
 ```sh
-npm install xspectrum-state
+yarn add xpertjs-state
 ```
 
-## Usage
+Using npm:
 
-To begin, call the `createStoreHook` function to generate a new Hook. Provide a initialState and a set of mutations, that contains in the function being passed, the actions callback to perform the updates.
+```sh
+npm install xpertjs-state
+```
+
+## Quick Start
+
+To begin, call the createStoreHook function to generate a new Hook.
+
+Start with an initial state and a group of mutations. The mutations schema will provide a callback with a set of actions that can be performed.
+
+### Creating an observable Store
 
 ```jsx
-import { createStoreHook } from "xspectrum-state";
-
 type Book = {
-  id: number;
+  id: string;
   title: string;
   author: string;
   genre: string;
@@ -50,23 +53,38 @@ type RemoveBookParams = Pick<Book, 'id'>;
 export const useBooks = createStoreHook({
   initialState: {
     books: [
-      { id: 1, title: "War and Peace", author: "Leo Tolstoy", genre: "Historical Fiction", publicationYear: 1869 },
-      { id: 2, title: "Crime and Punishment", author: "Fyodor Dostoevsky", genre: "Psychological Fiction", publicationYear: 1866 },
-      { id: 3, title: "Pride and Prejudice", author: "Jane Austen", genre: "Romance", publicationYear: 1813 },
-      { id: 4, title: "1984", author: "George Orwell", genre: "Dystopian Fiction", publicationYear: 1949 },
+      { 
+        id: '1fe8d8aa-ac7d-4bd3-b123-5ca0bea9fac4', 
+        title: "War and Peace", 
+        author: "Leo Tolstoy", 
+        genre: "Historical Fiction", 
+        publicationYear: 1869 
+      },
+      { 
+        id: '04b2014f-3d6d-46a9-b5a4-c9345d6e3406', 
+        title: "Crime and Punishment",
+        author: "Fyodor Dostoevsky", 
+        genre: "Psychological Fiction", 
+        publicationYear: 1866 
+      },
+      { 
+        id: '46335384-9fab-41c9-abc0-b1b80e12fab6', 
+        title: "1984", 
+        author: "George Orwell", 
+        genre: "Dystopian Fiction", 
+        publicationYear: 1949
+      },
     ],
   },
   mutations: ({ get, set }) => ({
     addBook: (params: AddBookParams) => {
-      const books = get().books;
-      const id = books.length > 0 ? Math.max(...books.map(book => book.id)) + 1 : 1;
       set({
         path: "books",
-        value: [...books, { id, ...params }],
+        value: [...get().books, { id: uuid(), ...params }],
       });
     },
-    removeBook: ({ id }: RemoveBookParams) => {
-      const books = get().books.filter((book) => book.id !== id);
+    removeBook: (params: RemoveBookParams) => {
+      const books = get().books.filter((book) => book.id !== params.id);
       set({ path: "books", value: books });
     },
   }),
@@ -74,6 +92,8 @@ export const useBooks = createStoreHook({
 ```
 
 This hook will be accessible globally, containing an array with your store state and an object with mutations.
+
+### Using the Hook in Components
 
 ```jsx
 import React from "react";
@@ -89,7 +109,7 @@ function Component() {
         {books.map((book) => (
           <li key={book.id}>
             <strong>{book.title}</strong> by {book.author} ({book.publicationYear})
-            <button onClick={() => removeBook({ id: book.id })}>Remove</button>
+            <button onClick={() => removeBook({ id: book.id })}>Remove this Book</button>
           </li>
         ))}
       </ul>
@@ -110,4 +130,7 @@ function Component() {
 }
 
 ```
+
+This component demonstrates how to use the useBooks hook to manage a list of books. 
+The addBook and removeBook functions update the global state, and the changes are reflected in the UI.
 

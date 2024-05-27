@@ -1,7 +1,7 @@
 {
-  "name": "xspectrum-state",
+  "name": "xpertjs-state",
   "version": "0.1.0",
-  "description": "Observable global state management library for React. Minimal declarative API.",
+  "description": "Global state management library for Modern React applications.",
   "license": "MIT",
   "main": "index.ts",
   "types": "lib/index.d.ts",
@@ -33,13 +33,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lestercorderomurillo/xspectrum-state.git"
+    "url": "git+https://github.com/lestercorderomurillo/xpertjs-state.git"
   },
   "author": "Lester Cordero Murillo",
   "bugs": {
-    "url": "https://github.com/lestercorderomurillo/xspectrum-state/issues"
+    "url": "https://github.com/lestercorderomurillo/xpertjs-state/issues"
   },
-  "homepage": "https://github.com/lestercorderomurillo/xspectrum-state#readme",
+  "homepage": "https://github.com/lestercorderomurillo/xpertjs-state#readme",
   "dependencies": {
     "react": "^18.2.0",
     "type-fest": "^4.18.2"
