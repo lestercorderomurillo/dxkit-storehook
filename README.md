@@ -1,42 +1,41 @@
 <p align="center">
-  <img src="logo.png" alt="logo" width="240">
+  <img src="logo.png" alt="logo" width="300">
 </p>
 
-**_xpertjs-state_** is a global state management library for modern React applications.
+**xp.js(alpha)** is a framework for Cross Platform React applications.
 
-The goal of this project is to provide a simple yet scalable solution for creating complex nested states that align with modern React architectures, while ensuring a smooth developer experience.
+**xp.js-state** is an single package from that framework.
 
-## Key features
+The goal of this package is to provide a simple declarative API to build complex yet scalable nested states that align with modern challenges, while ensuring a smooth developer experience, as well for your users.
 
-- **Optimistic Updates**: Encourages developers to write optimistic updates by default.
+# Key features
+
+- **Optimistic updates**: Encourages developers to write optimistic updates by default.
 - **High performance**: Utilizes a signal-based architecture for efficient, fast updates to components.
-- **Centralized state**: Provides a predictable global state through mutations and subscriptions based on a minimal API.
-- **Seamless integration**: Easily integrates to components using hooks.
+- **Centralized state**: Provides a predictable global state through mutations.
+- **Data synchronization**: With a mutation-change tracking system, you can subscribe to events, to easily synchorize, render optimistic mutations or rollback them.
+- **Hook-Ready syntax**: Easily integrates to React components using hooks yntax.
 - **Type-Safe documentation**: Offers type autocompletion and comprehensive documentation.
+
+# Quick Start
 
 ## Installation
 
-To install this library, you can use either Yarn or npm. We highly recommend using Yarn.
-
-Using Yarn:
+To get ready fast, here you can copy/paste to install from yarn or npm.
 
 ```sh
-yarn add xpertjs-state
+yarn add xp.js-state
 ```
-
-Using npm:
 
 ```sh
-npm install xpertjs-state
+npm install xp.js-state
 ```
 
-## Quick Start
+## Creating an observable Store
 
 To begin, call the createStoreHook function to generate a new Hook.
 
 Start with an initial state and a group of mutations. The mutations schema will provide a callback with a set of actions that can be performed.
-
-### Creating an observable Store
 
 ```jsx
 type Book = {
@@ -93,7 +92,9 @@ export const useBooks = createStoreHook({
 
 This hook will be accessible globally, containing an array with your store state and an object with mutations.
 
-### Using the Hook in Components
+## Using the Hook in Components
+
+This component demonstrates how to use the useBooks hook to manage a list of books. The addBook and removeBook functions update the global state, and the changes are reflected in the UI.
 
 ```jsx
 import React from "react";
@@ -129,6 +130,3 @@ function Component() {
   );
 }
 ```
-
-This component demonstrates how to use the useBooks hook to manage a list of books.
-The addBook and removeBook functions update the global state, and the changes are reflected in the UI.
